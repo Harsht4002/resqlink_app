@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ResQLink</string>
+    <string name="hint_json_path">navigation_graph.json</string>
+    <string name="hint_model_path">building.glb</string>
+    <string name="btn_load">Load</string>
+    <string name="btn_find_path">Find Path</string>
+    <string name="start_location">Start</string>
+    <string name="destination">Destination</string>
+    <string name="no_path_found">No path found</string>
+</resources>

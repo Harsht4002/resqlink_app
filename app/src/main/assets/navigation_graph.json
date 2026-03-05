@@ -1,0 +1,16 @@
+{
+  "nodes": [
+    {"id": "room101", "x": 0, "y": 0, "z": 0, "floor": 1},
+    {"id": "room102", "x": 3, "y": 0, "z": 0, "floor": 1},
+    {"id": "hall1", "x": 1.5, "y": 0, "z": 2, "floor": 1},
+    {"id": "lab3", "x": 4, "y": 0, "z": 3, "floor": 1},
+    {"id": "stairs", "x": 2, "y": 0, "z": 5, "floor": 1}
+  ],
+  "edges": [
+    {"from": "room101", "to": "hall1", "cost": 2.5},
+    {"from": "room102", "to": "hall1", "cost": 2.5},
+    {"from": "hall1", "to": "lab3", "cost": 3},
+    {"from": "hall1", "to": "stairs", "cost": 3.5},
+    {"from": "lab3", "to": "stairs", "cost": 2}
+  ]
+}
