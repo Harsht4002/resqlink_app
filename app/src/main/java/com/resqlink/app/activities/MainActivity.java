@@ -1,38 +1,82 @@
 package com.resqlink.app.activities;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Build;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.resqlink.app.R;
+import com.resqlink.app.ble.BeaconMapping;
+import com.resqlink.app.ble.BeaconMappingLoader;
+import com.resqlink.app.ble.BlePacketCodec;
+import com.resqlink.app.ble.BleScannerManager;
+import com.resqlink.app.ble.VictimBroadcaster;
 import com.resqlink.app.navigation.Graph;
 import com.resqlink.app.navigation.GraphLoader;
+import com.resqlink.app.navigation.Node;
 import com.resqlink.app.pathfinding.AStarPathfinder;
 import com.resqlink.app.rendering.ModelLoader;
 import com.resqlink.app.rendering.SceneController;
 import com.resqlink.app.ui.LocationSelector;
 import com.resqlink.app.ui.NavigationController;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import io.github.sceneview.SceneView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements BleScannerManager.Listener, VictimBroadcaster.Listener {
+
+    private static final int BLE_PERMISSION_REQ_CODE = 1001;
+    private static final int NETWORK_ID = 0x0001;
 
     private SceneView sceneView;
     private EditText etJsonPath;
     private EditText etModelPath;
     private Spinner spinnerStart;
     private Spinner spinnerDestination;
+    private Spinner spinnerVictims;
     private Button btnLoad;
     private Button btnFindPath;
+    private Button btnNextTurn;
+    private Button btnNavigateVictim;
+    private Button btnStartBleScan;
+    private Button btnBroadcastVictim;
+    private TextView tvRouteStatus;
+    private TextView tvTurnInstruction;
+    private TextView tvDetectedRoom;
+    private Button btnTogglePanel;
+    private View panelInput;
+    private BottomSheetBehavior<View> panelBehavior;
 
     private Graph graph;
     private SceneController sceneController;
     private LocationSelector locationSelector;
     private NavigationController navigationController;
+    private BleScannerManager bleScannerManager;
+    private VictimBroadcaster victimBroadcaster;
+    private boolean isBleScanning = false;
+    private int currentDetectedRoomId = -1;
+
+    private final Map<Integer, BeaconMapping> beaconMap = new HashMap<>();
+    private final Map<Integer, BlePacketCodec.DeviceLocationPacket> victimsByDeviceId = new HashMap<>();
+    private final List<String> victimSpinnerItems = new ArrayList<>();
+    private ArrayAdapter<String> victimAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,23 +89,74 @@ public class MainActivity extends AppCompatActivity {
         btnLoad = findViewById(R.id.btnLoad);
         spinnerStart = findViewById(R.id.spinnerStart);
         spinnerDestination = findViewById(R.id.spinnerDestination);
+        spinnerVictims = findViewById(R.id.spinnerVictims);
         btnFindPath = findViewById(R.id.btnFindPath);
+        btnNextTurn = findViewById(R.id.btnNextTurn);
+        btnNavigateVictim = findViewById(R.id.btnNavigateVictim);
+        btnStartBleScan = findViewById(R.id.btnStartBleScan);
+        btnBroadcastVictim = findViewById(R.id.btnBroadcastVictim);
+        tvRouteStatus = findViewById(R.id.tvRouteStatus);
+        tvTurnInstruction = findViewById(R.id.tvTurnInstruction);
+        tvDetectedRoom = findViewById(R.id.tvDetectedRoom);
+        btnTogglePanel = findViewById(R.id.btnTogglePanel);
+        panelInput = findViewById(R.id.panelInput);
+
+        panelBehavior = BottomSheetBehavior.from(panelInput);
+        panelBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        panelBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@androidx.annotation.NonNull View bottomSheet, int newState) {
+                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                    btnTogglePanel.setText(R.string.panel_collapse);
+                } else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                    btnTogglePanel.setText(R.string.panel_expand);
+                }
+            }
+
+            @Override
+            public void onSlide(@androidx.annotation.NonNull View bottomSheet, float slideOffset) {
+            }
+        });
 
         sceneController = new SceneController(sceneView, this);
         sceneController.initializeScene();
 
         locationSelector = new LocationSelector(spinnerStart, spinnerDestination);
+        victimAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, victimSpinnerItems);
+        spinnerVictims.setAdapter(victimAdapter);
+        victimSpinnerItems.add("No victims detected");
+        victimAdapter.notifyDataSetChanged();
+
+        bleScannerManager = new BleScannerManager(this, NETWORK_ID, this);
+        victimBroadcaster = new VictimBroadcaster(this, NETWORK_ID, new Random().nextInt(65535), this);
 
         btnLoad.setOnClickListener(v -> loadGraphAndModel());
         btnFindPath.setOnClickListener(v -> {
             if (navigationController != null) {
                 navigationController.onPathRequested();
+                updateRouteUiAfterFind();
             } else {
-                Toast.makeText(this, "Load graph and model first", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.load_graph_model_first), Toast.LENGTH_SHORT).show();
             }
         });
+        btnNextTurn.setOnClickListener(v -> onNextTurnClicked());
+        btnStartBleScan.setOnClickListener(v -> toggleBleScan());
+        btnBroadcastVictim.setOnClickListener(v -> toggleVictimBroadcast());
+        btnNavigateVictim.setOnClickListener(v -> onNavigateToVictim());
+        btnTogglePanel.setOnClickListener(v -> togglePanel());
 
         loadGraphAndModel();
+        ensureBlePermissions();
+    }
+
+    private void togglePanel() {
+        if (panelBehavior == null) return;
+        int state = panelBehavior.getState();
+        if (state == BottomSheetBehavior.STATE_EXPANDED) {
+            panelBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        } else {
+            panelBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        }
     }
 
     private void loadGraphAndModel() {
@@ -78,6 +173,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         locationSelector.setGraph(graph);
+        loadBeaconMappings();
         navigationController = new NavigationController(
                 graph,
                 new AStarPathfinder(graph),
@@ -87,6 +183,8 @@ public class MainActivity extends AppCompatActivity {
         );
 
         sceneController.clearPath();
+        tvRouteStatus.setText(getString(R.string.route_idle));
+        tvTurnInstruction.setText(getString(R.string.turn_instruction_placeholder));
         sceneController.loadBuildingModel(modelPath, new ModelLoader.ModelLoadListener() {
             @Override
             public void onLoadSuccess(io.github.sceneview.node.ModelNode node) {
@@ -103,15 +201,223 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (isBleScanning) {
+            bleScannerManager.start();
+        }
     }
 
     @Override
     protected void onPause() {
+        bleScannerManager.stop();
+        victimBroadcaster.stopBroadcast();
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
+        bleScannerManager.stop();
+        victimBroadcaster.stopBroadcast();
         super.onDestroy();
+    }
+
+    private void updateRouteUiAfterFind() {
+        if (navigationController == null || !navigationController.hasActiveRoute()) {
+            tvRouteStatus.setText(getString(R.string.route_idle));
+            tvTurnInstruction.setText(getString(R.string.turn_instruction_placeholder));
+            return;
+        }
+
+        tvRouteStatus.setText(
+                getString(
+                        R.string.route_step_format,
+                        navigationController.getCurrentTurnStep() + 1,
+                        navigationController.getTotalTurnSteps()
+                )
+        );
+        tvTurnInstruction.setText(navigationController.getCurrentInstruction());
+    }
+
+    private void onNextTurnClicked() {
+        if (navigationController == null || !navigationController.hasActiveRoute()) {
+            Toast.makeText(this, getString(R.string.route_idle), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String instruction = navigationController.moveToNextTurn();
+        if (!navigationController.hasActiveRoute()) {
+            tvRouteStatus.setText(getString(R.string.route_completed));
+            tvTurnInstruction.setText(instruction);
+            return;
+        }
+        tvRouteStatus.setText(
+                getString(
+                        R.string.route_step_format,
+                        navigationController.getCurrentTurnStep() + 1,
+                        navigationController.getTotalTurnSteps()
+                )
+        );
+        tvTurnInstruction.setText(instruction);
+    }
+
+    private void loadBeaconMappings() {
+        beaconMap.clear();
+        try {
+            BeaconMappingLoader loader = new BeaconMappingLoader();
+            List<BeaconMapping> mappings = loader.loadMappings(getAssets(), "beacon_mappings.json");
+            beaconMap.putAll(loader.toBeaconIdMap(mappings));
+        } catch (Exception e) {
+            Toast.makeText(this, "Failed to load beacon mappings: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void toggleBleScan() {
+        if (!hasBlePermissions()) {
+            ensureBlePermissions();
+            return;
+        }
+        if (isBleScanning) {
+            bleScannerManager.stop();
+            isBleScanning = false;
+            btnStartBleScan.setText(R.string.start_ble_scan);
+        } else {
+            bleScannerManager.start();
+            isBleScanning = true;
+            btnStartBleScan.setText(R.string.stop_ble_scan);
+        }
+    }
+
+    private void toggleVictimBroadcast() {
+        if (!hasBlePermissions()) {
+            ensureBlePermissions();
+            return;
+        }
+        if (victimBroadcaster.isBroadcasting()) {
+            victimBroadcaster.stopBroadcast();
+            btnBroadcastVictim.setText(R.string.start_victim_broadcast);
+        } else {
+            if (currentDetectedRoomId < 0 && graph != null) {
+                Node fallback = navigationController != null ? navigationController.getSelectedStart() : null;
+                currentDetectedRoomId = fallback != null ? fallback.getRoomId() : -1;
+            }
+            if (currentDetectedRoomId < 0) {
+                Toast.makeText(this, "No room detected yet for victim broadcast", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Node roomNode = graph != null ? graph.getNodeByRoomId(currentDetectedRoomId) : null;
+            int floor = roomNode != null ? roomNode.getFloor() : 0;
+            victimBroadcaster.startBroadcast(currentDetectedRoomId, floor);
+            btnBroadcastVictim.setText(R.string.stop_victim_broadcast);
+        }
+    }
+
+    private void onNavigateToVictim() {
+        if (navigationController == null || graph == null) {
+            return;
+        }
+        if (victimsByDeviceId.isEmpty()) {
+            Toast.makeText(this, getString(R.string.no_victim_selected), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String selected = (String) spinnerVictims.getSelectedItem();
+        if (selected == null || !selected.startsWith("Victim")) {
+            Toast.makeText(this, getString(R.string.no_victim_selected), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        int deviceId = parseDeviceId(selected);
+        BlePacketCodec.DeviceLocationPacket packet = victimsByDeviceId.get(deviceId);
+        if (packet == null) {
+            Toast.makeText(this, getString(R.string.no_victim_selected), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Node startNode = graph.getNodeByRoomId(currentDetectedRoomId);
+        if (startNode == null) {
+            startNode = navigationController.getSelectedStart();
+        }
+        Node victimNode = graph.getNodeByRoomId(packet.roomId);
+        if (startNode == null || victimNode == null) {
+            Toast.makeText(this, "Missing start/victim node", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        navigationController.onPathRequested(startNode, victimNode);
+        updateRouteUiAfterFind();
+    }
+
+    private int parseDeviceId(String item) {
+        try {
+            int start = item.indexOf('#');
+            int end = item.indexOf(' ');
+            if (start == -1) return -1;
+            if (end == -1) end = item.length();
+            return Integer.parseInt(item.substring(start + 1, end));
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    private boolean hasBlePermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            return ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
+                    && ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADVERTISE) == PackageManager.PERMISSION_GRANTED
+                    && ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED;
+        }
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void ensureBlePermissions() {
+        if (hasBlePermissions()) return;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_ADVERTISE, Manifest.permission.BLUETOOTH_CONNECT},
+                    BLE_PERMISSION_REQ_CODE
+            );
+        } else {
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    BLE_PERMISSION_REQ_CODE
+            );
+        }
+    }
+
+    @Override
+    public void onDetectedRoom(int roomId, int beaconId) {
+        BeaconMapping mapping = beaconMap.get(beaconId);
+        if (mapping != null) {
+            roomId = mapping.getRoomId();
+        }
+        currentDetectedRoomId = roomId;
+        Node node = graph != null ? graph.getNodeByRoomId(roomId) : null;
+        String roomText = node != null ? node.getId() : ("roomId " + roomId);
+        runOnUiThread(() -> tvDetectedRoom.setText("Detected room: " + roomText + " (beacon " + beaconId + ")"));
+    }
+
+    @Override
+    public void onVictimLocation(BlePacketCodec.DeviceLocationPacket packet) {
+        victimsByDeviceId.put(packet.deviceId, packet);
+        runOnUiThread(this::refreshVictimSpinner);
+    }
+
+    private void refreshVictimSpinner() {
+        victimSpinnerItems.clear();
+        if (victimsByDeviceId.isEmpty()) {
+            victimSpinnerItems.add("No victims detected");
+        } else {
+            for (BlePacketCodec.DeviceLocationPacket packet : victimsByDeviceId.values()) {
+                Node node = graph != null ? graph.getNodeByRoomId(packet.roomId) : null;
+                String roomLabel = node != null ? node.getId() : ("roomId " + packet.roomId);
+                victimSpinnerItems.add("Victim#" + packet.deviceId + " - " + roomLabel + " - seq " + packet.seq);
+            }
+        }
+        victimAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onScanError(String message) {
+        runOnUiThread(() -> Toast.makeText(this, message, Toast.LENGTH_SHORT).show());
+    }
+
+    @Override
+    public void onStatus(String message) {
+        runOnUiThread(() -> Toast.makeText(this, message, Toast.LENGTH_SHORT).show());
     }
 }

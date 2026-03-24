@@ -9,6 +9,7 @@ import java.util.Objects;
  * Node coordinates (x, y, z) must match the 3D model's coordinate system.
  */
 public class Node {
+    private final int roomId;
     private final String id;
     private final float x;
     private final float y;
@@ -16,13 +17,18 @@ public class Node {
     private final int floor;
     private final List<String> neighborIds;
 
-    public Node(String id, float x, float y, float z, int floor) {
+    public Node(int roomId, String id, float x, float y, float z, int floor) {
+        this.roomId = roomId;
         this.id = id;
         this.x = x;
         this.y = y;
         this.z = z;
         this.floor = floor;
         this.neighborIds = new ArrayList<>();
+    }
+
+    public int getRoomId() {
+        return roomId;
     }
 
     public String getId() {
@@ -74,6 +80,6 @@ public class Node {
 
     @Override
     public String toString() {
-        return "Node{id='" + id + "', x=" + x + ", y=" + y + ", z=" + z + ", floor=" + floor + "}";
+        return "Node{roomId=" + roomId + ", id='" + id + "', x=" + x + ", y=" + y + ", z=" + z + ", floor=" + floor + "}";
     }
 }
