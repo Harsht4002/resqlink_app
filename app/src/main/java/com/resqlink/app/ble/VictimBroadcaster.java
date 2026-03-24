@@ -22,7 +22,6 @@ public class VictimBroadcaster {
     private final int networkId;
     private final int deviceId;
     private final Listener listener;
-    private final BluetoothLeAdvertiser advertiser;
     private int seq = 1;
     private boolean broadcasting = false;
 
@@ -31,9 +30,6 @@ public class VictimBroadcaster {
         this.networkId = networkId;
         this.deviceId = deviceId;
         this.listener = listener;
-        BluetoothManager bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
-        BluetoothAdapter adapter = bluetoothManager != null ? bluetoothManager.getAdapter() : null;
-        this.advertiser = adapter != null ? adapter.getBluetoothLeAdvertiser() : null;
     }
 
     @SuppressLint("MissingPermission")
@@ -42,6 +38,16 @@ public class VictimBroadcaster {
             listener.onStatus("Bluetooth advertise permission missing");
             return;
         }
+        BluetoothAdapter adapter = getBluetoothAdapter();
+        if (adapter == null) {
+            listener.onStatus("Bluetooth unsupported on this device");
+            return;
+        }
+        if (!adapter.isEnabled()) {
+            listener.onStatus("Bluetooth is turned off");
+            return;
+        }
+        BluetoothLeAdvertiser advertiser = adapter.getBluetoothLeAdvertiser();
         if (advertiser == null) {
             listener.onStatus("BLE advertiser unavailable");
             return;
@@ -73,6 +79,8 @@ public class VictimBroadcaster {
 
     @SuppressLint("MissingPermission")
     public void stopBroadcast() {
+        BluetoothAdapter adapter = getBluetoothAdapter();
+        BluetoothLeAdvertiser advertiser = adapter != null ? adapter.getBluetoothLeAdvertiser() : null;
         if (advertiser != null && broadcasting) {
             advertiser.stopAdvertising(callback);
         }
@@ -90,5 +98,10 @@ public class VictimBroadcaster {
             return ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_ADVERTISE) == PackageManager.PERMISSION_GRANTED;
         }
         return true;
+    }
+
+    private BluetoothAdapter getBluetoothAdapter() {
+        BluetoothManager bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
+        return bluetoothManager != null ? bluetoothManager.getAdapter() : null;
     }
 }

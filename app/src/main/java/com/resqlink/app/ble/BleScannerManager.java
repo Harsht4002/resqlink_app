@@ -27,7 +27,6 @@ public class BleScannerManager {
     private final Context context;
     private final int networkId;
     private final Listener listener;
-    private final BluetoothLeScanner scanner;
     private final Map<Integer, BeaconReading> beaconReadings = new HashMap<>();
     private int lastDetectedRoom = -1;
 
@@ -41,9 +40,6 @@ public class BleScannerManager {
         this.context = context;
         this.networkId = networkId;
         this.listener = listener;
-        BluetoothManager bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
-        BluetoothAdapter adapter = bluetoothManager != null ? bluetoothManager.getAdapter() : null;
-        this.scanner = adapter != null ? adapter.getBluetoothLeScanner() : null;
     }
 
     @SuppressLint("MissingPermission")
@@ -52,6 +48,16 @@ public class BleScannerManager {
             listener.onScanError("Bluetooth scan permission missing");
             return;
         }
+        BluetoothAdapter adapter = getBluetoothAdapter();
+        if (adapter == null) {
+            listener.onScanError("Bluetooth unsupported on this device");
+            return;
+        }
+        if (!adapter.isEnabled()) {
+            listener.onScanError("Bluetooth is turned off");
+            return;
+        }
+        BluetoothLeScanner scanner = adapter.getBluetoothLeScanner();
         if (scanner == null) {
             listener.onScanError("Bluetooth LE scanner unavailable");
             return;
@@ -61,6 +67,8 @@ public class BleScannerManager {
 
     @SuppressLint("MissingPermission")
     public void stop() {
+        BluetoothAdapter adapter = getBluetoothAdapter();
+        BluetoothLeScanner scanner = adapter != null ? adapter.getBluetoothLeScanner() : null;
         if (scanner != null) {
             scanner.stopScan(scanCallback);
         }
@@ -122,5 +130,10 @@ public class BleScannerManager {
             return ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED;
         }
         return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private BluetoothAdapter getBluetoothAdapter() {
+        BluetoothManager bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
+        return bluetoothManager != null ? bluetoothManager.getAdapter() : null;
     }
 }
