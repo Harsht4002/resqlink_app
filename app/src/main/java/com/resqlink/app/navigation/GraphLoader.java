@@ -55,12 +55,13 @@ public class GraphLoader {
         JSONArray nodesArray = root.getJSONArray("nodes");
         for (int i = 0; i < nodesArray.length(); i++) {
             JSONObject n = nodesArray.getJSONObject(i);
+            int roomId = n.getInt("roomId");
             String id = n.getString("id");
             float x = (float) n.optDouble("x", 0);
             float y = (float) n.optDouble("y", 0);
             float z = (float) n.optDouble("z", 0);
             int floor = n.optInt("floor", 0);
-            Node node = new Node(id, x, y, z, floor);
+            Node node = new Node(roomId, id, x, y, z, floor);
             graph.addNode(node);
         }
 

@@ -11,17 +11,20 @@ import java.util.HashMap;
  */
 public class Graph {
     private final Map<String, Node> nodes;
+    private final Map<Integer, Node> nodesByRoomId;
     private final List<Edge> edges;
     private final Map<String, Map<String, Double>> edgeCostMap;
 
     public Graph() {
         this.nodes = new HashMap<>();
+        this.nodesByRoomId = new HashMap<>();
         this.edges = new ArrayList<>();
         this.edgeCostMap = new HashMap<>();
     }
 
     public void addNode(Node node) {
         nodes.put(node.getId(), node);
+        nodesByRoomId.put(node.getRoomId(), node);
     }
 
     public void addEdge(Edge edge) {
@@ -53,6 +56,10 @@ public class Graph {
 
     public List<String> getAllNodeIds() {
         return new ArrayList<>(nodes.keySet());
+    }
+
+    public Node getNodeByRoomId(int roomId) {
+        return nodesByRoomId.get(roomId);
     }
 
     public double getEdgeCost(Node a, Node b) {
