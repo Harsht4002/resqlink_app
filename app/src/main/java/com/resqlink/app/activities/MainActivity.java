@@ -1,10 +1,15 @@
 package com.resqlink.app.activities;
 
 import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Build;
+import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ArrayAdapter;
@@ -43,7 +48,11 @@ import io.github.sceneview.SceneView;
 public class MainActivity extends AppCompatActivity implements BleScannerManager.Listener, VictimBroadcaster.Listener {
 
     private static final int BLE_PERMISSION_REQ_CODE = 1001;
+    private static final int ENABLE_BLUETOOTH_REQ_CODE = 1002;
     private static final int NETWORK_ID = 0x0001;
+    private static final int PENDING_BLE_ACTION_NONE = 0;
+    private static final int PENDING_BLE_ACTION_SCAN = 1;
+    private static final int PENDING_BLE_ACTION_BROADCAST = 2;
 
     private SceneView sceneView;
     private EditText etJsonPath;
@@ -62,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
     private TextView tvDetectedRoom;
     private Button btnTogglePanel;
     private View panelInput;
+    private View panelPrimaryControls;
+    private View panelScroll;
     private BottomSheetBehavior<View> panelBehavior;
 
     private Graph graph;
@@ -72,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
     private VictimBroadcaster victimBroadcaster;
     private boolean isBleScanning = false;
     private int currentDetectedRoomId = -1;
+    private int pendingBleAction = PENDING_BLE_ACTION_NONE;
 
     private final Map<Integer, BeaconMapping> beaconMap = new HashMap<>();
     private final Map<Integer, BlePacketCodec.DeviceLocationPacket> victimsByDeviceId = new HashMap<>();
@@ -100,8 +112,11 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
         tvDetectedRoom = findViewById(R.id.tvDetectedRoom);
         btnTogglePanel = findViewById(R.id.btnTogglePanel);
         panelInput = findViewById(R.id.panelInput);
+        panelPrimaryControls = findViewById(R.id.panelPrimaryControls);
+        panelScroll = findViewById(R.id.panelScroll);
 
         panelBehavior = BottomSheetBehavior.from(panelInput);
+        panelBehavior.setFitToContents(true);
         panelBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         panelBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
@@ -117,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
             public void onSlide(@androidx.annotation.NonNull View bottomSheet, float slideOffset) {
             }
         });
+        configureBottomSheet();
 
         sceneController = new SceneController(sceneView, this);
         sceneController.initializeScene();
@@ -157,6 +173,38 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
         } else {
             panelBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         }
+    }
+
+    private void configureBottomSheet() {
+        panelInput.post(() -> {
+            int peekHeight = measurePeekHeight();
+            if (peekHeight > 0) {
+                panelBehavior.setPeekHeight(peekHeight, true);
+            }
+            applyExpandedScrollLimit();
+        });
+    }
+
+    private int measurePeekHeight() {
+        int width = panelInput.getWidth();
+        if (width <= 0) {
+            width = getResources().getDisplayMetrics().widthPixels;
+        }
+
+        int widthSpec = View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY);
+        int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        panelPrimaryControls.measure(widthSpec, heightSpec);
+        View header = findViewById(R.id.panelHeader);
+        header.measure(widthSpec, heightSpec);
+        return header.getMeasuredHeight() + panelPrimaryControls.getMeasuredHeight();
+    }
+
+    private void applyExpandedScrollLimit() {
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        int maxScrollHeight = (int) (metrics.heightPixels * 0.42f);
+        ViewGroup.LayoutParams params = panelScroll.getLayoutParams();
+        params.height = maxScrollHeight;
+        panelScroll.setLayoutParams(params);
     }
 
     private void loadGraphAndModel() {
@@ -274,6 +322,9 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
             ensureBlePermissions();
             return;
         }
+        if (!ensureBluetoothEnabled(PENDING_BLE_ACTION_SCAN)) {
+            return;
+        }
         if (isBleScanning) {
             bleScannerManager.stop();
             isBleScanning = false;
@@ -288,6 +339,9 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
     private void toggleVictimBroadcast() {
         if (!hasBlePermissions()) {
             ensureBlePermissions();
+            return;
+        }
+        if (!ensureBluetoothEnabled(PENDING_BLE_ACTION_BROADCAST)) {
             return;
         }
         if (victimBroadcaster.isBroadcasting()) {
@@ -307,6 +361,26 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
             victimBroadcaster.startBroadcast(currentDetectedRoomId, floor);
             btnBroadcastVictim.setText(R.string.stop_victim_broadcast);
         }
+    }
+
+    private boolean ensureBluetoothEnabled(int requestedAction) {
+        BluetoothAdapter adapter = getBluetoothAdapter();
+        if (adapter == null) {
+            Toast.makeText(this, "Bluetooth unsupported on this device", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (adapter.isEnabled()) {
+            return true;
+        }
+        pendingBleAction = requestedAction;
+        Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+        startActivityForResult(enableIntent, ENABLE_BLUETOOTH_REQ_CODE);
+        return false;
+    }
+
+    private BluetoothAdapter getBluetoothAdapter() {
+        BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
+        return bluetoothManager != null ? bluetoothManager.getAdapter() : null;
     }
 
     private void onNavigateToVictim() {
@@ -376,6 +450,30 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     BLE_PERMISSION_REQ_CODE
             );
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != ENABLE_BLUETOOTH_REQ_CODE) {
+            return;
+        }
+
+        BluetoothAdapter adapter = getBluetoothAdapter();
+        boolean enabled = adapter != null && adapter.isEnabled();
+        int action = pendingBleAction;
+        pendingBleAction = PENDING_BLE_ACTION_NONE;
+
+        if (!enabled) {
+            Toast.makeText(this, "Bluetooth is required for BLE features", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (action == PENDING_BLE_ACTION_SCAN) {
+            toggleBleScan();
+        } else if (action == PENDING_BLE_ACTION_BROADCAST) {
+            toggleVictimBroadcast();
         }
     }
 

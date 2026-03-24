@@ -29,4 +29,6 @@
     <string name="panel_navigation_controls">Navigation Controls</string>
     <string name="panel_expand">Expand</string>
     <string name="panel_collapse">Collapse</string>
+    <string name="section_ble">BLE</string>
+    <string name="section_advanced">Advanced</string>
 </resources>
