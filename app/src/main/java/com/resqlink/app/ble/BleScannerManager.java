@@ -65,6 +65,10 @@ public class BleScannerManager {
             listener.onScanError("Bluetooth LE scanner unavailable");
             return;
         }
+        try {
+            scanner.stopScan(scanCallback);
+        } catch (Exception ignored) {
+        }
         ScanFilter filter = new ScanFilter.Builder()
                 .setManufacturerData(BlePacketCodec.MANUFACTURER_ID, new byte[]{0}, new byte[]{0})
                 .build();

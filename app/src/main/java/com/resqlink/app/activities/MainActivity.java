@@ -10,6 +10,7 @@ import android.os.Build;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ArrayAdapter;
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
     private Spinner spinnerStart;
     private Spinner spinnerDestination;
     private Spinner spinnerVictims;
+    private Spinner spinnerVictimLocation;
     private Button btnLoad;
     private Button btnFindPath;
     private Button btnNextTurn;
@@ -103,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
         spinnerStart = findViewById(R.id.spinnerStart);
         spinnerDestination = findViewById(R.id.spinnerDestination);
         spinnerVictims = findViewById(R.id.spinnerVictims);
+        spinnerVictimLocation = findViewById(R.id.spinnerVictimLocation);
         btnFindPath = findViewById(R.id.btnFindPath);
         btnNextTurn = findViewById(R.id.btnNextTurn);
         btnNavigateVictim = findViewById(R.id.btnNavigateVictim);
@@ -143,6 +146,22 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
         spinnerVictims.setAdapter(victimAdapter);
         victimSpinnerItems.add("No victims detected");
         victimAdapter.notifyDataSetChanged();
+
+        spinnerVictimLocation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (!wasUserBroadcasting || graph == null) return;
+                String nodeId = (String) parent.getItemAtPosition(position);
+                Node node = graph.getNode(nodeId);
+                if (node != null) {
+                    victimBroadcaster.startBroadcast(node.getRoomId(), node.getFloor());
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
 
         bleScannerManager = new BleScannerManager(this, NETWORK_ID, this);
         victimBroadcaster = new VictimBroadcaster(this, NETWORK_ID, new Random().nextInt(65535), this);
@@ -222,6 +241,10 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
         }
 
         locationSelector.setGraph(graph);
+        List<String> nodeIds = graph.getAllNodeIds();
+        ArrayAdapter<String> victimLocAdapter = new ArrayAdapter<>(
+                this, android.R.layout.simple_spinner_dropdown_item, nodeIds);
+        spinnerVictimLocation.setAdapter(victimLocAdapter);
         loadBeaconMappings();
         navigationController = new NavigationController(
                 graph,
@@ -353,18 +376,15 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
             wasUserBroadcasting = false;
             btnBroadcastVictim.setText(R.string.start_victim_broadcast);
         } else {
-            if (currentDetectedRoomId < 0 && graph != null) {
-                Node fallback = navigationController != null ? navigationController.getSelectedStart() : null;
-                currentDetectedRoomId = fallback != null ? fallback.getRoomId() : -1;
-            }
-            if (currentDetectedRoomId < 0) {
-                Toast.makeText(this, "No room detected yet for victim broadcast", Toast.LENGTH_SHORT).show();
+            String selectedNodeId = (String) spinnerVictimLocation.getSelectedItem();
+            Node selectedNode = selectedNodeId != null && graph != null
+                    ? graph.getNode(selectedNodeId) : null;
+            if (selectedNode == null) {
+                Toast.makeText(this, "Select a broadcast location first", Toast.LENGTH_SHORT).show();
                 return;
             }
-            Node roomNode = graph != null ? graph.getNodeByRoomId(currentDetectedRoomId) : null;
-            int floor = roomNode != null ? roomNode.getFloor() : 0;
             wasUserBroadcasting = true;
-            victimBroadcaster.startBroadcast(currentDetectedRoomId, floor);
+            victimBroadcaster.startBroadcast(selectedNode.getRoomId(), selectedNode.getFloor());
             btnBroadcastVictim.setText(R.string.stop_victim_broadcast);
         }
     }

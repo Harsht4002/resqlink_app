@@ -7,9 +7,11 @@ import com.resqlink.app.navigation.Graph;
 import com.resqlink.app.navigation.Node;
 import com.resqlink.app.pathfinding.AStarPathfinder;
 import com.resqlink.app.rendering.SceneController;
+import com.resqlink.app.utils.MathUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Coordinates user input, pathfinding, and path display.
@@ -75,16 +77,31 @@ public class NavigationController {
             return "No active route";
         }
         int nodeIndex = turnIndices.get(currentTurnStep);
-        if (currentTurnStep == 0) {
-            return "Start from " + activePath.get(nodeIndex).getId();
-        }
-        int previousTurnNodeIndex = turnIndices.get(currentTurnStep - 1);
+        Node currentNode = activePath.get(nodeIndex);
+
+        // Last step — arrival
         if (nodeIndex == activePath.size() - 1) {
-            return "Arrive at " + activePath.get(nodeIndex).getId();
+            return "Arrive at " + currentNode.getId();
         }
 
-        String direction = computeTurnDirection(previousTurnNodeIndex, nodeIndex);
-        return direction + " toward " + activePath.get(nodeIndex).getId();
+        // Distance to next turn/destination
+        String distInfo = "";
+        if (currentTurnStep + 1 < turnIndices.size()) {
+            int nextTurnIdx = turnIndices.get(currentTurnStep + 1);
+            double dist = computeSegmentDistance(nodeIndex, nextTurnIdx);
+            String nextName = activePath.get(nextTurnIdx).getId();
+            distInfo = " — walk " + formatDistance(dist) + " to " + nextName;
+        }
+
+        // First step — start
+        if (currentTurnStep == 0) {
+            return "Start at " + currentNode.getId() + distInfo;
+        }
+
+        // Middle steps — turn direction
+        int prevTurnNodeIdx = turnIndices.get(currentTurnStep - 1);
+        String direction = computeTurnDirection(prevTurnNodeIdx, nodeIndex);
+        return direction + " at " + currentNode.getId() + distInfo;
     }
 
     public String moveToNextTurn() {
@@ -138,6 +155,18 @@ public class NavigationController {
 
     public int getTotalTurnSteps() {
         return turnIndices.size();
+    }
+
+    private double computeSegmentDistance(int fromIndex, int toIndex) {
+        double dist = 0;
+        for (int i = fromIndex; i < toIndex && i + 1 < activePath.size(); i++) {
+            dist += MathUtils.euclideanDistance(activePath.get(i), activePath.get(i + 1));
+        }
+        return dist;
+    }
+
+    private String formatDistance(double distance) {
+        return String.format(Locale.US, "%.1fm", distance);
     }
 
     private List<Integer> computeTurnIndices(List<Node> path) {
