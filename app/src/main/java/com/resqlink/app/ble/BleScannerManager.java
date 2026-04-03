@@ -6,7 +6,9 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.SystemClock;
@@ -14,6 +16,7 @@ import android.util.SparseArray;
 
 import androidx.core.content.ContextCompat;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,7 +65,13 @@ public class BleScannerManager {
             listener.onScanError("Bluetooth LE scanner unavailable");
             return;
         }
-        scanner.startScan(scanCallback);
+        ScanFilter filter = new ScanFilter.Builder()
+                .setManufacturerData(BlePacketCodec.MANUFACTURER_ID, new byte[]{0}, new byte[]{0})
+                .build();
+        ScanSettings settings = new ScanSettings.Builder()
+                .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                .build();
+        scanner.startScan(Collections.singletonList(filter), settings, scanCallback);
     }
 
     @SuppressLint("MissingPermission")
@@ -95,6 +104,11 @@ public class BleScannerManager {
                     listener.onVictimLocation(packet);
                 }
             }
+        }
+
+        @Override
+        public void onScanFailed(int errorCode) {
+            listener.onScanError("BLE scan failed (error " + errorCode + ")");
         }
     };
 

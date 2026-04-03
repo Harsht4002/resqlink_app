@@ -24,6 +24,8 @@ public class VictimBroadcaster {
     private final Listener listener;
     private int seq = 1;
     private boolean broadcasting = false;
+    private int lastRoomId = -1;
+    private int lastFloor = 0;
 
     public VictimBroadcaster(Context context, int networkId, int deviceId, Listener listener) {
         this.context = context;
@@ -52,6 +54,8 @@ public class VictimBroadcaster {
             listener.onStatus("BLE advertiser unavailable");
             return;
         }
+        this.lastRoomId = roomId;
+        this.lastFloor = floor;
         stopBroadcast();
         byte[] payload = BlePacketCodec.encodeDeviceLocation(
                 networkId,
@@ -73,25 +77,44 @@ public class VictimBroadcaster {
                 .setIncludeDeviceName(false)
                 .build();
         advertiser.startAdvertising(settings, data, callback);
-        broadcasting = true;
-        listener.onStatus("Victim broadcast started");
     }
 
     @SuppressLint("MissingPermission")
     public void stopBroadcast() {
+        broadcasting = false;
         BluetoothAdapter adapter = getBluetoothAdapter();
         BluetoothLeAdvertiser advertiser = adapter != null ? adapter.getBluetoothLeAdvertiser() : null;
-        if (advertiser != null && broadcasting) {
-            advertiser.stopAdvertising(callback);
+        if (advertiser != null) {
+            try {
+                advertiser.stopAdvertising(callback);
+            } catch (IllegalStateException ignored) {
+            }
         }
-        broadcasting = false;
     }
 
     public boolean isBroadcasting() {
         return broadcasting;
     }
 
-    private final AdvertiseCallback callback = new AdvertiseCallback() {};
+    public void resumeBroadcast() {
+        if (lastRoomId >= 0) {
+            startBroadcast(lastRoomId, lastFloor);
+        }
+    }
+
+    private final AdvertiseCallback callback = new AdvertiseCallback() {
+        @Override
+        public void onStartSuccess(AdvertiseSettings settingsInEffect) {
+            broadcasting = true;
+            listener.onStatus("Victim broadcast started");
+        }
+
+        @Override
+        public void onStartFailure(int errorCode) {
+            broadcasting = false;
+            listener.onStatus("Broadcast failed (error " + errorCode + ")");
+        }
+    };
 
     private boolean hasAdvertisePermission() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {

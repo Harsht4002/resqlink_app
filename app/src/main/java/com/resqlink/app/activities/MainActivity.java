@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
     private BleScannerManager bleScannerManager;
     private VictimBroadcaster victimBroadcaster;
     private boolean isBleScanning = false;
+    private boolean wasUserBroadcasting = false;
     private int currentDetectedRoomId = -1;
     private int pendingBleAction = PENDING_BLE_ACTION_NONE;
 
@@ -252,6 +253,9 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
         if (isBleScanning) {
             bleScannerManager.start();
         }
+        if (wasUserBroadcasting) {
+            victimBroadcaster.resumeBroadcast();
+        }
     }
 
     @Override
@@ -344,8 +348,9 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
         if (!ensureBluetoothEnabled(PENDING_BLE_ACTION_BROADCAST)) {
             return;
         }
-        if (victimBroadcaster.isBroadcasting()) {
+        if (victimBroadcaster.isBroadcasting() || wasUserBroadcasting) {
             victimBroadcaster.stopBroadcast();
+            wasUserBroadcasting = false;
             btnBroadcastVictim.setText(R.string.start_victim_broadcast);
         } else {
             if (currentDetectedRoomId < 0 && graph != null) {
@@ -358,6 +363,7 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
             }
             Node roomNode = graph != null ? graph.getNodeByRoomId(currentDetectedRoomId) : null;
             int floor = roomNode != null ? roomNode.getFloor() : 0;
+            wasUserBroadcasting = true;
             victimBroadcaster.startBroadcast(currentDetectedRoomId, floor);
             btnBroadcastVictim.setText(R.string.stop_victim_broadcast);
         }
