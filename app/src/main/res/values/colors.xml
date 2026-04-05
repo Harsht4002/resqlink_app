@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#2196F3</color>
-    <color name="colorPrimaryDark">#1976D2</color>
-    <color name="colorAccent">#FF5722</color>
+    <color name="rescue_primary">#0F4C5C</color>
+    <color name="rescue_primary_dark">#0B3948</color>
+    <color name="rescue_primary_light">#DCEBED</color>
+    <color name="rescue_accent">#F26419</color>
+    <color name="rescue_accent_dark">#CC4B08</color>
+    <color name="rescue_alert">#B83B2D</color>
+    <color name="rescue_success">#2F855A</color>
+    <color name="rescue_background">#F3F7F6</color>
+    <color name="rescue_surface">#FFFFFF</color>
+    <color name="rescue_surface_alt">#EDF3F4</color>
+    <color name="rescue_input_bg">#F8FBFA</color>
+    <color name="rescue_outline">#C6D5D9</color>
+    <color name="rescue_text_primary">#16333D</color>
+    <color name="rescue_text_secondary">#5C727A</color>
+    <color name="rescue_on_primary">#FFFFFF</color>
+    <color name="rescue_on_accent">#FFFFFF</color>
+    <color name="rescue_scrim">#B3122229</color>
+    <color name="rescue_chip_bg">#D9E8EB</color>
+    <color name="rescue_handle">#A9BCC2</color>
 </resources>

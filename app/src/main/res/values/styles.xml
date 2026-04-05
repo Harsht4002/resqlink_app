@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TextAppearance.ResQLink.HeroEyebrow" parent="TextAppearance.MaterialComponents.Overline">
+        <item name="android:textColor">@color/rescue_primary_light</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.08</item>
+    </style>
+
+    <style name="TextAppearance.ResQLink.HeroTitle" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="android:textColor">@color/rescue_on_primary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.ResQLink.HeroBody" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="android:textColor">@color/rescue_primary_light</item>
+    </style>
+
+    <style name="TextAppearance.ResQLink.SectionTitle" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="android:textColor">@color/rescue_text_primary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.ResQLink.SectionBody" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="android:textColor">@color/rescue_text_secondary</item>
+    </style>
+
+    <style name="Widget.ResQLink.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:textAllCaps">false</item>
+        <item name="cornerRadius">@dimen/button_corner_radius</item>
+        <item name="android:minHeight">@dimen/button_min_height</item>
+        <item name="backgroundTint">@color/rescue_primary</item>
+        <item name="android:textColor">@color/rescue_on_primary</item>
+    </style>
+
+    <style name="Widget.ResQLink.Button.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:textAllCaps">false</item>
+        <item name="cornerRadius">@dimen/button_corner_radius</item>
+        <item name="android:minHeight">@dimen/button_min_height</item>
+        <item name="strokeColor">@color/rescue_outline</item>
+        <item name="android:textColor">@color/rescue_primary</item>
+    </style>
+
+    <style name="Widget.ResQLink.Button.Accent" parent="Widget.MaterialComponents.Button">
+        <item name="android:textAllCaps">false</item>
+        <item name="cornerRadius">@dimen/button_corner_radius</item>
+        <item name="android:minHeight">@dimen/button_min_height</item>
+        <item name="backgroundTint">@color/rescue_accent</item>
+        <item name="android:textColor">@color/rescue_on_accent</item>
+    </style>
+
+    <style name="Widget.ResQLink.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+        <item name="boxBackgroundColor">@color/rescue_input_bg</item>
+        <item name="boxStrokeColor">@color/rescue_outline</item>
+        <item name="hintTextColor">@color/rescue_text_secondary</item>
+        <item name="boxCornerRadiusTopStart">@dimen/field_corner_radius</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/field_corner_radius</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/field_corner_radius</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/field_corner_radius</item>
+    </style>
+
+    <style name="Widget.ResQLink.TextInputEditText" parent="Widget.MaterialComponents.TextInputEditText.OutlinedBox.Dense">
+        <item name="android:textColor">@color/rescue_text_primary</item>
+        <item name="android:textColorHint">@color/rescue_text_secondary</item>
+    </style>
+</resources>

@@ -1,0 +1,9 @@
+{
+  "mappings": [
+    {"beaconId": 1001, "roomId": 101, "nodeId": "room101"},
+    {"beaconId": 1002, "roomId": 102, "nodeId": "room102"},
+    {"beaconId": 1201, "roomId": 201, "nodeId": "hall1"},
+    {"beaconId": 1301, "roomId": 301, "nodeId": "lab3"},
+    {"beaconId": 1401, "roomId": 401, "nodeId": "stairs"}
+  ]
+}

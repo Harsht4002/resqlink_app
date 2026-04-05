@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.ResQLink" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+    <style name="Theme.ResQLink" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/rescue_primary</item>
+        <item name="colorPrimaryVariant">@color/rescue_primary_dark</item>
+        <item name="colorSecondary">@color/rescue_accent</item>
+        <item name="colorSecondaryVariant">@color/rescue_accent_dark</item>
+        <item name="colorSurface">@color/rescue_surface</item>
+        <item name="android:colorBackground">@color/rescue_background</item>
+        <item name="colorOnPrimary">@color/rescue_on_primary</item>
+        <item name="colorOnSecondary">@color/rescue_on_accent</item>
+        <item name="colorOnSurface">@color/rescue_text_primary</item>
+        <item name="colorError">@color/rescue_alert</item>
+        <item name="android:statusBarColor">@color/rescue_primary_dark</item>
+        <item name="android:navigationBarColor">@color/rescue_surface</item>
+        <item name="android:windowBackground">@color/rescue_background</item>
+        <item name="materialButtonStyle">@style/Widget.ResQLink.Button</item>
     </style>
 </resources>

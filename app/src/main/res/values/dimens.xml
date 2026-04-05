@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="screen_margin">16dp</dimen>
+    <dimen name="panel_corner_radius">28dp</dimen>
+    <dimen name="card_corner_radius">20dp</dimen>
+    <dimen name="button_corner_radius">18dp</dimen>
+    <dimen name="button_min_height">52dp</dimen>
+    <dimen name="field_corner_radius">18dp</dimen>
+    <dimen name="chip_corner_radius">18dp</dimen>
+    <dimen name="section_spacing">16dp</dimen>
+    <dimen name="section_inner_spacing">14dp</dimen>
+    <dimen name="control_spacing">12dp</dimen>
+    <dimen name="top_scrim_height">220dp</dimen>
+</resources>

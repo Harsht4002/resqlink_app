@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ResQLink</string>
+    <string name="dashboard_eyebrow">Rescue Operations</string>
+    <string name="dashboard_title">Field Coordination Console</string>
+    <string name="dashboard_subtitle">Guide responders, monitor room detection, and route victim recovery from one control surface.</string>
+    <string name="mission_status">Live Mission Status</string>
+    <string name="quick_actions">Quick actions</string>
+    <string name="quick_actions_subtitle">Keep the most important route controls within reach.</string>
+    <string name="section_route_planning">Route planning</string>
+    <string name="section_route_planning_subtitle">Choose a start point and destination from the indoor graph.</string>
+    <string name="section_victim_signals">Victim signals</string>
+    <string name="section_victim_signals_subtitle">Scan for BLE broadcasts, set a relay point, and navigate to a detected victim.</string>
+    <string name="section_assets">Asset configuration</string>
+    <string name="section_assets_subtitle">Swap the graph or 3D model when you need to test another building layout.</string>
+    <string name="label_start_location">Start location</string>
+    <string name="label_destination_location">Destination</string>
     <string name="hint_json_path">navigation_graph.json</string>
     <string name="hint_model_path">building.glb</string>
     <string name="btn_load">Load</string>
@@ -32,4 +46,15 @@
     <string name="section_ble">BLE</string>
     <string name="broadcast_location_label">Broadcast location</string>
     <string name="section_advanced">Advanced</string>
+    <string name="toast_graph_load_failed">Failed to load graph from %1$s</string>
+    <string name="toast_model_loaded">Model loaded</string>
+    <string name="toast_model_load_failed">Model load failed: %1$s</string>
+    <string name="toast_select_broadcast_location_first">Select a broadcast location first</string>
+    <string name="toast_bluetooth_unsupported">Bluetooth unsupported on this device</string>
+    <string name="toast_bluetooth_required">Bluetooth is required for BLE features</string>
+    <string name="toast_missing_start_victim_node">Missing start or victim node</string>
+    <string name="detected_room_with_beacon">Detected room: %1$s (beacon %2$d)</string>
+    <string name="victim_item_format">Victim#%1$d - %2$s - seq %3$d</string>
+    <string name="room_id_format">roomId %1$d</string>
+    <string name="no_victims_detected">No victims detected</string>
 </resources>

@@ -79,26 +79,26 @@ public class NavigationController {
         int nodeIndex = turnIndices.get(currentTurnStep);
         Node currentNode = activePath.get(nodeIndex);
 
-        // Last step — arrival
+        // Last step - arrival.
         if (nodeIndex == activePath.size() - 1) {
             return "Arrive at " + currentNode.getId();
         }
 
-        // Distance to next turn/destination
+        // Distance to next turn or destination.
         String distInfo = "";
         if (currentTurnStep + 1 < turnIndices.size()) {
             int nextTurnIdx = turnIndices.get(currentTurnStep + 1);
             double dist = computeSegmentDistance(nodeIndex, nextTurnIdx);
             String nextName = activePath.get(nextTurnIdx).getId();
-            distInfo = " — walk " + formatDistance(dist) + " to " + nextName;
+            distInfo = " - walk " + formatDistance(dist) + " to " + nextName;
         }
 
-        // First step — start
+        // First step - start.
         if (currentTurnStep == 0) {
             return "Start at " + currentNode.getId() + distInfo;
         }
 
-        // Middle steps — turn direction
+        // Middle steps - turn direction.
         int prevTurnNodeIdx = turnIndices.get(currentTurnStep - 1);
         String direction = computeTurnDirection(prevTurnNodeIdx, nodeIndex);
         return direction + " at " + currentNode.getId() + distInfo;

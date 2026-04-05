@@ -35,9 +35,10 @@ public class LocationSelector {
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 spinnerStart.getContext(),
-                android.R.layout.simple_spinner_dropdown_item,
+                com.resqlink.app.R.layout.item_spinner_selected,
                 ids
         );
+        adapter.setDropDownViewResource(com.resqlink.app.R.layout.item_spinner_dropdown);
         spinnerStart.setAdapter(adapter);
         spinnerDestination.setAdapter(adapter);
 
