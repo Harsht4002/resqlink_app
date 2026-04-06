@@ -49,7 +49,7 @@
       "id": "hall1",
       "renderX": 0.0,
       "renderY": 0.04,
-      "renderZ": 2.0,
+      "renderZ": -2.0,
       "floor": 1
     },
 
@@ -58,7 +58,7 @@
       "id": "_lab_branch",
       "renderX": 1.2,
       "renderY": 0.04,
-      "renderZ": 2.0,
+      "renderZ": -2.0,
       "floor": 1
     },
     {
@@ -66,7 +66,7 @@
       "id": "_lab3_door",
       "renderX": 2.4,
       "renderY": 0.04,
-      "renderZ": 2.0,
+      "renderZ": -2.0,
       "floor": 1
     },
     {
@@ -74,7 +74,7 @@
       "id": "lab3",
       "renderX": 3.0,
       "renderY": 0.04,
-      "renderZ": 2.0,
+      "renderZ": -2.0,
       "floor": 1
     },
 
@@ -83,7 +83,7 @@
       "id": "_stairs_door",
       "renderX": 0.0,
       "renderY": 0.04,
-      "renderZ": 5.0,
+      "renderZ": -5.0,
       "floor": 1
     },
     {
@@ -91,7 +91,7 @@
       "id": "stairs",
       "renderX": 0.0,
       "renderY": 0.04,
-      "renderZ": 5.8,
+      "renderZ": -5.8,
       "floor": 1
     }
   ],
