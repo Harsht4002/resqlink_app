@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
 
         panelBehavior = BottomSheetBehavior.from(panelInput);
         panelBehavior.setFitToContents(true);
-        panelBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        panelBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         panelBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@androidx.annotation.NonNull View bottomSheet, int newState) {
