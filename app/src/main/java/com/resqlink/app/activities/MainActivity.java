@@ -7,10 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -20,11 +17,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.resqlink.app.R;
 import com.resqlink.app.ble.BeaconMapping;
 import com.resqlink.app.ble.BeaconMappingLoader;
@@ -80,11 +74,6 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
     private TextView tvRouteStatus;
     private TextView tvTurnInstruction;
     private TextView tvDetectedRoom;
-    private Button btnTogglePanel;
-    private View panelInput;
-    private View panelPrimaryControls;
-    private View panelScroll;
-    private BottomSheetBehavior<View> panelBehavior;
 
     private Graph graph;
     private SceneController sceneController;
@@ -130,29 +119,6 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
         tvRouteStatus = findViewById(R.id.tvRouteStatus);
         tvTurnInstruction = findViewById(R.id.tvTurnInstruction);
         tvDetectedRoom = findViewById(R.id.tvDetectedRoom);
-        btnTogglePanel = findViewById(R.id.btnTogglePanel);
-        panelInput = findViewById(R.id.panelInput);
-        panelPrimaryControls = findViewById(R.id.panelPrimaryControls);
-        panelScroll = findViewById(R.id.panelScroll);
-
-        panelBehavior = BottomSheetBehavior.from(panelInput);
-        panelBehavior.setFitToContents(true);
-        panelBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        panelBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(@androidx.annotation.NonNull View bottomSheet, int newState) {
-                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    btnTogglePanel.setText(R.string.panel_collapse);
-                } else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                    btnTogglePanel.setText(R.string.panel_expand);
-                }
-            }
-
-            @Override
-            public void onSlide(@androidx.annotation.NonNull View bottomSheet, float slideOffset) {
-            }
-        });
-        configureBottomSheet();
 
         sceneController = new SceneController(sceneView, this);
         sceneController.initializeScene();
@@ -205,89 +171,10 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
         btnToggleGraphDebug.setOnClickListener(v -> toggleGraphDebug());
         btnPlaceHazard.setOnClickListener(v -> onPlaceHazard());
         btnRemoveHazard.setOnClickListener(v -> onRemoveHazard());
-        btnTogglePanel.setOnClickListener(v -> togglePanel());
 
         loadGraphAndModel();
         ensureBlePermissions();
         syncActionState();
-    }
-
-    private void togglePanel() {
-        if (panelBehavior == null) return;
-        int state = panelBehavior.getState();
-        if (state == BottomSheetBehavior.STATE_EXPANDED) {
-            panelBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        } else {
-            panelBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        }
-    }
-
-    private void configureBottomSheet() {
-        panelInput.post(() -> {
-            applyPanelWidth();
-            int peekHeight = measurePeekHeight();
-            if (peekHeight > 0) {
-                panelBehavior.setPeekHeight(peekHeight, true);
-            }
-            applyExpandedScrollLimit();
-        });
-    }
-
-    private void applyPanelWidth() {
-        ViewGroup.LayoutParams layoutParams = panelInput.getLayoutParams();
-        if (!(layoutParams instanceof CoordinatorLayout.LayoutParams)) {
-            return;
-        }
-
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-        float widthDp = metrics.widthPixels / metrics.density;
-        int horizontalMargin = dpToPx(widthDp >= 600 ? 24 : 16);
-
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layoutParams;
-        params.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
-        params.setMargins(horizontalMargin, 0, horizontalMargin, horizontalMargin);
-
-        if (widthDp >= 840) {
-            params.width = Math.min(metrics.widthPixels - (horizontalMargin * 2), dpToPx(560));
-        } else if (widthDp >= 600) {
-            params.width = Math.min(metrics.widthPixels - (horizontalMargin * 2), dpToPx(520));
-        } else {
-            params.width = ViewGroup.LayoutParams.MATCH_PARENT;
-        }
-
-        panelInput.setLayoutParams(params);
-    }
-
-    private int measurePeekHeight() {
-        int width = panelInput.getWidth();
-        if (width <= 0) {
-            width = getResources().getDisplayMetrics().widthPixels;
-        }
-
-        int widthSpec = View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY);
-        int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-        View header = findViewById(R.id.panelHeader);
-        View status = findViewById(R.id.panelStatus);
-        header.measure(widthSpec, heightSpec);
-        status.measure(widthSpec, heightSpec);
-        panelPrimaryControls.measure(widthSpec, heightSpec);
-        return header.getMeasuredHeight() + status.getMeasuredHeight() + panelPrimaryControls.getMeasuredHeight();
-    }
-
-    private void applyExpandedScrollLimit() {
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-        float widthDp = metrics.widthPixels / metrics.density;
-        float heightRatio = widthDp >= 600
-                ? 0.50f
-                : (metrics.widthPixels > metrics.heightPixels ? 0.42f : 0.48f);
-        int maxScrollHeight = Math.max(dpToPx(240), (int) (metrics.heightPixels * heightRatio));
-        ViewGroup.LayoutParams params = panelScroll.getLayoutParams();
-        params.height = maxScrollHeight;
-        panelScroll.setLayoutParams(params);
-    }
-
-    private int dpToPx(int dp) {
-        return Math.round(dp * getResources().getDisplayMetrics().density);
     }
 
     private ArrayAdapter<String> createSpinnerAdapter(List<String> items) {
