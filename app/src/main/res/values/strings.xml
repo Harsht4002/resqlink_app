@@ -13,6 +13,8 @@
     <string name="section_victim_signals_subtitle">Scan for BLE broadcasts, set a relay point, and navigate to a detected victim.</string>
     <string name="section_assets">Asset configuration</string>
     <string name="section_assets_subtitle">Swap the graph or 3D model when you need to test another building layout.</string>
+    <string name="graph_debug_title">Graph debug overlay</string>
+    <string name="graph_debug_subtitle">Show graph edges and node markers in the 3D scene to compare JSON coordinates with the loaded building model.</string>
     <string name="label_start_location">Start location</string>
     <string name="label_destination_location">Destination</string>
     <string name="hint_json_path">navigation_graph.json</string>
@@ -49,6 +51,7 @@
     <string name="toast_graph_load_failed">Failed to load graph from %1$s</string>
     <string name="toast_model_loaded">Model loaded</string>
     <string name="toast_model_load_failed">Model load failed: %1$s</string>
+    <string name="toast_graph_debug_requires_graph">Load a graph before enabling the debug overlay</string>
     <string name="toast_select_broadcast_location_first">Select a broadcast location first</string>
     <string name="toast_bluetooth_unsupported">Bluetooth unsupported on this device</string>
     <string name="toast_bluetooth_required">Bluetooth is required for BLE features</string>
@@ -57,4 +60,6 @@
     <string name="victim_item_format">Victim#%1$d - %2$s - seq %3$d</string>
     <string name="room_id_format">roomId %1$d</string>
     <string name="no_victims_detected">No victims detected</string>
+    <string name="show_graph_debug">Show Graph Debug</string>
+    <string name="hide_graph_debug">Hide Graph Debug</string>
 </resources>

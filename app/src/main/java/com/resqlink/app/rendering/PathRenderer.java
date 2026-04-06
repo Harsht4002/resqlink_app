@@ -1,7 +1,6 @@
 package com.resqlink.app.rendering;
 
 
-import com.resqlink.app.navigation.Node;
 import com.resqlink.app.utils.MathUtils;
 
 import java.util.ArrayList;
@@ -38,9 +37,9 @@ public class PathRenderer {
      * Renders the path as cylinder segments between consecutive nodes.
      * Uses y = node.y + 0.1f to avoid clipping into the floor.
      */
-    public void renderPath(List<Node> path) {
+    public void renderPath(List<float[]> pathPoints) {
         clearPath();
-        if (path == null || path.size() < 2) return;
+        if (pathPoints == null || pathPoints.size() < 2) return;
 
         var engine = sceneView.getEngine();
         if (engine == null) return;
@@ -57,16 +56,19 @@ public class PathRenderer {
         );
         if (haloMaterial == null || coreMaterial == null) return;
 
-        for (int i = 0; i < path.size() - 1; i++) {
-            Node a = path.get(i);
-            Node b = path.get(i + 1);
+        for (int i = 0; i < pathPoints.size() - 1; i++) {
+            float[] a = pathPoints.get(i);
+            float[] b = pathPoints.get(i + 1);
+            if (a == null || b == null || a.length < 3 || b.length < 3) {
+                continue;
+            }
 
-            float ax = a.getX();
-            float ay = a.getY() + PATH_OFFSET_Y;
-            float az = a.getZ();
-            float bx = b.getX();
-            float by = b.getY() + PATH_OFFSET_Y;
-            float bz = b.getZ();
+            float ax = a[0];
+            float ay = a[1] + PATH_OFFSET_Y;
+            float az = a[2];
+            float bx = b[0];
+            float by = b[1] + PATH_OFFSET_Y;
+            float bz = b[2];
 
             float mx = (ax + bx) / 2;
             float my = (ay + by) / 2;

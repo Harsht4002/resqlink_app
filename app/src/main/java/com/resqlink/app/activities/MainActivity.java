@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
     private Button btnNavigateVictim;
     private Button btnStartBleScan;
     private Button btnBroadcastVictim;
+    private Button btnToggleGraphDebug;
     private TextView tvRouteStatus;
     private TextView tvTurnInstruction;
     private TextView tvDetectedRoom;
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
     private BleScannerManager bleScannerManager;
     private VictimBroadcaster victimBroadcaster;
     private boolean isBleScanning = false;
+    private boolean isGraphDebugVisible = false;
     private boolean wasUserBroadcasting = false;
     private int currentDetectedRoomId = -1;
     private int pendingBleAction = PENDING_BLE_ACTION_NONE;
@@ -113,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
         btnNavigateVictim = findViewById(R.id.btnNavigateVictim);
         btnStartBleScan = findViewById(R.id.btnStartBleScan);
         btnBroadcastVictim = findViewById(R.id.btnBroadcastVictim);
+        btnToggleGraphDebug = findViewById(R.id.btnToggleGraphDebug);
         tvRouteStatus = findViewById(R.id.tvRouteStatus);
         tvTurnInstruction = findViewById(R.id.tvTurnInstruction);
         tvDetectedRoom = findViewById(R.id.tvDetectedRoom);
@@ -181,6 +184,7 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
         btnStartBleScan.setOnClickListener(v -> toggleBleScan());
         btnBroadcastVictim.setOnClickListener(v -> toggleVictimBroadcast());
         btnNavigateVictim.setOnClickListener(v -> onNavigateToVictim());
+        btnToggleGraphDebug.setOnClickListener(v -> toggleGraphDebug());
         btnTogglePanel.setOnClickListener(v -> togglePanel());
 
         loadGraphAndModel();
@@ -275,6 +279,7 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
         boolean hasVictimTarget = graph != null && !victimsByDeviceId.isEmpty();
         btnNextTurn.setEnabled(hasRoute);
         btnNavigateVictim.setEnabled(hasVictimTarget);
+        btnToggleGraphDebug.setText(isGraphDebugVisible ? R.string.hide_graph_debug : R.string.show_graph_debug);
     }
 
     private void loadGraphAndModel() {
@@ -291,7 +296,7 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
         }
 
         locationSelector.setGraph(graph);
-        List<String> nodeIds = graph.getAllNodeIds();
+        List<String> nodeIds = graph.getSelectableNodeIds();
         ArrayAdapter<String> victimLocAdapter = createSpinnerAdapter(nodeIds);
         spinnerVictimLocation.setAdapter(victimLocAdapter);
         loadBeaconMappings();
@@ -306,6 +311,11 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
         sceneController.clearPath();
         tvRouteStatus.setText(getString(R.string.route_idle));
         tvTurnInstruction.setText(getString(R.string.turn_instruction_placeholder));
+        if (isGraphDebugVisible) {
+            sceneController.renderGraphDebug(graph);
+        } else {
+            sceneController.clearGraphDebug();
+        }
         syncActionState();
         sceneController.loadBuildingModel(modelPath, new ModelLoader.ModelLoadListener() {
             @Override
@@ -591,6 +601,21 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
             }
         }
         victimAdapter.notifyDataSetChanged();
+        syncActionState();
+    }
+
+    private void toggleGraphDebug() {
+        if (graph == null) {
+            Toast.makeText(this, R.string.toast_graph_debug_requires_graph, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        isGraphDebugVisible = !isGraphDebugVisible;
+        if (isGraphDebugVisible) {
+            sceneController.renderGraphDebug(graph);
+        } else {
+            sceneController.clearGraphDebug();
+        }
         syncActionState();
     }
 

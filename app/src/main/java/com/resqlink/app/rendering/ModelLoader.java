@@ -13,6 +13,7 @@ public class ModelLoader {
 
     private final SceneView sceneView;
     private final Context context;
+    private ModelNode currentModelNode;
 
     public ModelLoader(SceneView sceneView, Context context) {
         this.sceneView = sceneView;
@@ -35,7 +36,11 @@ public class ModelLoader {
         loader.loadModelInstanceAsync(assetPath, (String p) -> p, (modelInstance) -> {
             if (modelInstance != null) {
                 ModelNode node = new ModelNode(modelInstance, true, null, null);
+                if (currentModelNode != null) {
+                    sceneView.removeChildNode(currentModelNode);
+                }
                 sceneView.addChildNode(node);
+                currentModelNode = node;
                 if (listener != null) listener.onLoadSuccess(node);
             } else {
                 if (listener != null) listener.onLoadFailed(new RuntimeException("Failed to load model"));

@@ -419,11 +419,34 @@
                                 android:text="@string/section_assets_subtitle"
                                 android:textAppearance="@style/TextAppearance.ResQLink.SectionBody" />
 
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/section_inner_spacing"
+                                android:text="@string/graph_debug_title"
+                                android:textAppearance="@style/TextAppearance.ResQLink.SectionTitle"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="@string/graph_debug_subtitle"
+                                android:textAppearance="@style/TextAppearance.ResQLink.SectionBody" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnToggleGraphDebug"
+                                style="@style/Widget.ResQLink.Button.Outlined"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/control_spacing"
+                                android:text="@string/show_graph_debug" />
+
                             <com.google.android.material.textfield.TextInputLayout
                                 style="@style/Widget.ResQLink.TextInputLayout"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/section_inner_spacing"
+                                android:layout_marginTop="@dimen/section_spacing"
                                 android:hint="@string/hint_json_path">
 
                                 <com.google.android.material.textfield.TextInputEditText

@@ -3,6 +3,7 @@ package com.resqlink.app.ui;
 import android.content.Context;
 import android.widget.Toast;
 
+import com.resqlink.app.navigation.Edge;
 import com.resqlink.app.navigation.Graph;
 import com.resqlink.app.navigation.Node;
 import com.resqlink.app.pathfinding.AStarPathfinder;
@@ -62,7 +63,8 @@ public class NavigationController {
 
     public void displayPath(List<Node> path) {
         if (path != null && !path.isEmpty()) {
-            sceneController.renderPath(path);
+            sceneController.clearPath();
+            sceneController.renderPath(buildRenderPath(path));
         } else {
             sceneController.clearPath();
         }
@@ -160,7 +162,12 @@ public class NavigationController {
     private double computeSegmentDistance(int fromIndex, int toIndex) {
         double dist = 0;
         for (int i = fromIndex; i < toIndex && i + 1 < activePath.size(); i++) {
-            dist += MathUtils.euclideanDistance(activePath.get(i), activePath.get(i + 1));
+            Node from = activePath.get(i);
+            Node to = activePath.get(i + 1);
+            dist += MathUtils.euclideanDistance(
+                    from.getRenderX(), from.getRenderY(), from.getRenderZ(),
+                    to.getRenderX(), to.getRenderY(), to.getRenderZ()
+            );
         }
         return dist;
     }
@@ -181,10 +188,10 @@ public class NavigationController {
             Node curr = path.get(i);
             Node next = path.get(i + 1);
 
-            float v1x = curr.getX() - prev.getX();
-            float v1z = curr.getZ() - prev.getZ();
-            float v2x = next.getX() - curr.getX();
-            float v2z = next.getZ() - curr.getZ();
+            float v1x = curr.getRenderX() - prev.getRenderX();
+            float v1z = curr.getRenderZ() - prev.getRenderZ();
+            float v2x = next.getRenderX() - curr.getRenderX();
+            float v2z = next.getRenderZ() - curr.getRenderZ();
 
             double len1 = Math.sqrt(v1x * v1x + v1z * v1z);
             double len2 = Math.sqrt(v2x * v2x + v2z * v2z);
@@ -207,6 +214,62 @@ public class NavigationController {
         return indices;
     }
 
+private List<float[]> buildRenderPath(List<Node> path) {
+    List<float[]> points = new ArrayList<>();
+    if (path == null || path.size() < 2) return points;
+
+    for (int i = 0; i < path.size() - 1; i++) {
+        Node from = path.get(i);
+        Node to = path.get(i + 1);
+
+        // ALWAYS connect directly node → node
+        points.add(from.getRenderPosition());
+        points.add(to.getRenderPosition());
+    }
+
+    return points;
+}
+    private void appendEdgePoints(List<float[]> points, Edge edge, Node from, Node to) {
+        List<float[]> renderPoints = edge.getRenderPoints();
+        if (renderPoints.isEmpty()) {
+            return;
+        }
+
+        boolean forward = edge.getFrom().equals(from) && edge.getTo().equals(to);
+        if (forward) {
+            for (float[] point : renderPoints) {
+                appendPoint(points, point);
+            }
+        } else {
+            for (int i = renderPoints.size() - 1; i >= 0; i--) {
+                appendPoint(points, renderPoints.get(i));
+            }
+        }
+    }
+
+    private void appendPoint(List<float[]> points, float[] candidate) {
+        if (candidate == null || candidate.length < 3) {
+            return;
+        }
+        if (points.isEmpty()) {
+            points.add(copyPoint(candidate));
+            return;
+        }
+
+        float[] last = points.get(points.size() - 1);
+        double dist = MathUtils.euclideanDistance(
+                last[0], last[1], last[2],
+                candidate[0], candidate[1], candidate[2]
+        );
+        if (dist > 1e-5) {
+            points.add(copyPoint(candidate));
+        }
+    }
+
+    private float[] copyPoint(float[] point) {
+        return new float[]{point[0], point[1], point[2]};
+    }
+
     private String computeTurnDirection(int fromTurnNodeIndex, int toTurnNodeIndex) {
         if (toTurnNodeIndex + 1 >= activePath.size() || fromTurnNodeIndex >= activePath.size()) {
             return "Continue";
@@ -216,10 +279,10 @@ public class NavigationController {
         Node at = activePath.get(toTurnNodeIndex);
         Node next = activePath.get(toTurnNodeIndex + 1);
 
-        float inX = at.getX() - from.getX();
-        float inZ = at.getZ() - from.getZ();
-        float outX = next.getX() - at.getX();
-        float outZ = next.getZ() - at.getZ();
+        float inX = at.getRenderX() - from.getRenderX();
+        float inZ = at.getRenderZ() - from.getRenderZ();
+        float outX = next.getRenderX() - at.getRenderX();
+        float outZ = next.getRenderZ() - at.getRenderZ();
 
         double inLen = Math.sqrt(inX * inX + inZ * inZ);
         double outLen = Math.sqrt(outX * outX + outZ * outZ);

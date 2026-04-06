@@ -2,8 +2,6 @@ package com.resqlink.app.pathfinding;
 
 import com.resqlink.app.navigation.Graph;
 import com.resqlink.app.navigation.Node;
-import com.resqlink.app.utils.MathUtils;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -15,8 +13,8 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 /**
- * A* pathfinding on the navigation graph.
- * Uses Euclidean distance heuristic. Returns empty list if no path found.
+ * Shortest-path search on the navigation graph.
+ * Uses Dijkstra-style expansion because graph coordinates may be approximate while edge costs are authoritative.
  */
 public class AStarPathfinder {
 
@@ -41,7 +39,7 @@ public class AStarPathfinder {
         gScore.put(start, 0.0);
 
         PriorityQueue<Node> openSet = new PriorityQueue<>(Comparator.comparingDouble(n ->
-                gScore.getOrDefault(n, Double.POSITIVE_INFINITY) + heuristic(n, goal)));
+                gScore.getOrDefault(n, Double.POSITIVE_INFINITY)));
         openSet.add(start);
 
         Set<Node> closedSet = new HashSet<>();
@@ -71,11 +69,6 @@ public class AStarPathfinder {
 
         return new ArrayList<>();
     }
-
-    private double heuristic(Node a, Node b) {
-        return MathUtils.euclideanDistance(a, b);
-    }
-
     private List<Node> reconstructPath(Map<Node, Node> cameFrom, Node current) {
         List<Node> path = new ArrayList<>();
         path.add(current);

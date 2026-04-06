@@ -1,91 +1,154 @@
 {
+  "coordinateSpace": "gltf",
+  "renderCoordinateSpace": "gltf",
   "nodes": [
     {
       "roomId": 101,
       "id": "room101",
-      "x": -2.0,
-      "y": 0.04,
-      "z": 0.0,
+      "renderX": -2.0,
+      "renderY": 0.04,
+      "renderZ": 0.0,
       "floor": 1
     },
     {
       "roomId": 9101,
       "id": "_room101_door",
-      "x": -1.2,
-      "y": 0.04,
-      "z": 0.0,
+      "renderX": -1.2,
+      "renderY": 0.04,
+      "renderZ": 0.0,
       "floor": 1
     },
 
     {
       "roomId": 102,
       "id": "room102",
-      "x": 2.0,
-      "y": 0.04,
-      "z": 0.0,
+      "renderX": 2.0,
+      "renderY": 0.04,
+      "renderZ": 0.0,
       "floor": 1
     },
     {
       "roomId": 9102,
       "id": "_room102_door",
-      "x": 1.2,
-      "y": 0.04,
-      "z": 0.0,
+      "renderX": 1.2,
+      "renderY": 0.04,
+      "renderZ": 0.0,
       "floor": 1
     },
 
     {
       "roomId": 9201,
       "id": "_hall_lower",
-      "x": 0.0,
-      "y": 0.04,
-      "z": 0.0,
+      "renderX": 0.0,
+      "renderY": 0.04,
+      "renderZ": 0.0,
       "floor": 1
     },
-    { "roomId": 201, "id": "hall1", "x": 0.0, "y": 0.04, "z": 2.0, "floor": 1 },
+    {
+      "roomId": 201,
+      "id": "hall1",
+      "renderX": 0.0,
+      "renderY": 0.04,
+      "renderZ": 2.0,
+      "floor": 1
+    },
 
     {
       "roomId": 9301,
       "id": "_lab_branch",
-      "x": 1.8,
-      "y": 0.04,
-      "z": 2.0,
+      "renderX": 1.2,
+      "renderY": 0.04,
+      "renderZ": 2.0,
       "floor": 1
     },
     {
       "roomId": 9302,
       "id": "_lab3_door",
-      "x": 2.4,
-      "y": 0.04,
-      "z": 2.0,
+      "renderX": 2.4,
+      "renderY": 0.04,
+      "renderZ": 2.0,
       "floor": 1
     },
-    { "roomId": 301, "id": "lab3", "x": 3.2, "y": 0.04, "z": 2.0, "floor": 1 },
+    {
+      "roomId": 301,
+      "id": "lab3",
+      "renderX": 3.0,
+      "renderY": 0.04,
+      "renderZ": 2.0,
+      "floor": 1
+    },
 
     {
       "roomId": 9401,
       "id": "_stairs_door",
-      "x": 0.0,
-      "y": 0.04,
-      "z": 5.0,
+      "renderX": 0.0,
+      "renderY": 0.04,
+      "renderZ": 5.0,
       "floor": 1
     },
-    { "roomId": 401, "id": "stairs", "x": 0.0, "y": 0.04, "z": 5.6, "floor": 1 }
+    {
+      "roomId": 401,
+      "id": "stairs",
+      "renderX": 0.0,
+      "renderY": 0.04,
+      "renderZ": 5.8,
+      "floor": 1
+    }
   ],
   "edges": [
-    { "from": "room101", "to": "_room101_door", "cost": 0.8 },
-    { "from": "_room101_door", "to": "_hall_lower", "cost": 1.2 },
+    {
+      "from": "room101",
+      "to": "_room101_door",
+      "cost": 0.8
+    },
+    {
+      "from": "_room101_door",
+      "to": "_hall_lower",
+      "cost": 1.2
+    },
 
-    { "from": "room102", "to": "_room102_door", "cost": 0.8 },
-    { "from": "_room102_door", "to": "_hall_lower", "cost": 1.2 },
+    {
+      "from": "room102",
+      "to": "_room102_door",
+      "cost": 0.8
+    },
+    {
+      "from": "_room102_door",
+      "to": "_hall_lower",
+      "cost": 1.2
+    },
 
-    { "from": "_hall_lower", "to": "hall1", "cost": 2.0 },
+    {
+      "from": "_hall_lower",
+      "to": "hall1",
+      "cost": 2.0
+    },
 
-    { "from": "hall1", "to": "_lab_branch", "cost": 1.8 },
-    { "from": "_lab_branch", "to": "_lab3_door", "cost": 0.6 },
-    { "from": "_lab3_door", "to": "lab3", "cost": 0.8 },
+    {
+      "from": "hall1",
+      "to": "_lab_branch",
+      "cost": 1.2
+    },
+    {
+      "from": "_lab_branch",
+      "to": "_lab3_door",
+      "cost": 1.2
+    },
+    {
+      "from": "_lab3_door",
+      "to": "lab3",
+      "cost": 0.8
+    },
 
-    { "from": "hall1", "to": "_stairs_door", "cost": 3.0 },
-    { "from": "_stairs_door", "to": "stairs", "cost": 0.6 }
+    {
+      "from": "hall1",
+      "to": "_stairs_door",
+      "cost": 3.0
+    },
+    {
+      "from": "_stairs_door",
+      "to": "stairs",
+      "cost": 0.6
+    }
   ]
 }

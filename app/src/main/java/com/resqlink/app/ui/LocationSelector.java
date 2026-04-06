@@ -30,7 +30,7 @@ public class LocationSelector {
     public void refreshOptions() {
         if (graph == null) return;
 
-        List<String> ids = graph.getAllNodeIds();
+        List<String> ids = graph.getSelectableNodeIds();
         if (ids.isEmpty()) return;
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
