@@ -33,6 +33,8 @@ import com.resqlink.app.ble.BleScannerManager;
 import com.resqlink.app.ble.VictimBroadcaster;
 import com.resqlink.app.navigation.Graph;
 import com.resqlink.app.navigation.GraphLoader;
+import com.resqlink.app.navigation.HazardManager;
+import com.resqlink.app.navigation.HazardType;
 import com.resqlink.app.navigation.Node;
 import com.resqlink.app.pathfinding.AStarPathfinder;
 import com.resqlink.app.rendering.ModelLoader;
@@ -71,6 +73,10 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
     private Button btnStartBleScan;
     private Button btnBroadcastVictim;
     private Button btnToggleGraphDebug;
+    private Spinner spinnerHazardNode;
+    private Spinner spinnerHazardType;
+    private Button btnPlaceHazard;
+    private Button btnRemoveHazard;
     private TextView tvRouteStatus;
     private TextView tvTurnInstruction;
     private TextView tvDetectedRoom;
@@ -86,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
     private NavigationController navigationController;
     private BleScannerManager bleScannerManager;
     private VictimBroadcaster victimBroadcaster;
+    private HazardManager hazardManager;
     private boolean isBleScanning = false;
     private boolean isGraphDebugVisible = false;
     private boolean wasUserBroadcasting = false;
@@ -116,6 +123,10 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
         btnStartBleScan = findViewById(R.id.btnStartBleScan);
         btnBroadcastVictim = findViewById(R.id.btnBroadcastVictim);
         btnToggleGraphDebug = findViewById(R.id.btnToggleGraphDebug);
+        spinnerHazardNode = findViewById(R.id.spinnerHazardNode);
+        spinnerHazardType = findViewById(R.id.spinnerHazardType);
+        btnPlaceHazard = findViewById(R.id.btnPlaceHazard);
+        btnRemoveHazard = findViewById(R.id.btnRemoveHazard);
         tvRouteStatus = findViewById(R.id.tvRouteStatus);
         tvTurnInstruction = findViewById(R.id.tvTurnInstruction);
         tvDetectedRoom = findViewById(R.id.tvDetectedRoom);
@@ -168,6 +179,13 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
             }
         });
 
+        hazardManager = new HazardManager();
+        List<String> hazardTypeLabels = new ArrayList<>();
+        for (HazardType type : HazardType.values()) {
+            hazardTypeLabels.add(type.getLabel());
+        }
+        spinnerHazardType.setAdapter(createSpinnerAdapter(hazardTypeLabels));
+
         bleScannerManager = new BleScannerManager(this, NETWORK_ID, this);
         victimBroadcaster = new VictimBroadcaster(this, NETWORK_ID, new Random().nextInt(65535), this);
 
@@ -185,6 +203,8 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
         btnBroadcastVictim.setOnClickListener(v -> toggleVictimBroadcast());
         btnNavigateVictim.setOnClickListener(v -> onNavigateToVictim());
         btnToggleGraphDebug.setOnClickListener(v -> toggleGraphDebug());
+        btnPlaceHazard.setOnClickListener(v -> onPlaceHazard());
+        btnRemoveHazard.setOnClickListener(v -> onRemoveHazard());
         btnTogglePanel.setOnClickListener(v -> togglePanel());
 
         loadGraphAndModel();
@@ -299,6 +319,10 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
         List<String> nodeIds = graph.getSelectableNodeIds();
         ArrayAdapter<String> victimLocAdapter = createSpinnerAdapter(nodeIds);
         spinnerVictimLocation.setAdapter(victimLocAdapter);
+        hazardManager.clear();
+        graph.setHazardManager(hazardManager);
+        spinnerHazardNode.setAdapter(createSpinnerAdapter(new ArrayList<>(nodeIds)));
+        sceneController.clearHazards();
         loadBeaconMappings();
         navigationController = new NavigationController(
                 graph,
@@ -602,6 +626,46 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
         }
         victimAdapter.notifyDataSetChanged();
         syncActionState();
+    }
+
+    private void onPlaceHazard() {
+        if (graph == null) {
+            Toast.makeText(this, R.string.load_graph_model_first, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String nodeId = (String) spinnerHazardNode.getSelectedItem();
+        String typeLabel = (String) spinnerHazardType.getSelectedItem();
+        if (nodeId == null || typeLabel == null) return;
+
+        HazardType type = HazardType.fromLabel(typeLabel);
+        if (type == null) return;
+
+        hazardManager.addHazard(nodeId, type);
+        refreshHazardMarkers();
+        Toast.makeText(this, getString(R.string.toast_hazard_placed, type.getLabel(), nodeId), Toast.LENGTH_SHORT).show();
+    }
+
+    private void onRemoveHazard() {
+        if (graph == null) return;
+        String nodeId = (String) spinnerHazardNode.getSelectedItem();
+        if (nodeId == null) return;
+
+        if (!hazardManager.hasHazard(nodeId)) {
+            Toast.makeText(this, R.string.toast_no_hazard_at_node, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        hazardManager.removeHazard(nodeId);
+        refreshHazardMarkers();
+        Toast.makeText(this, getString(R.string.toast_hazard_removed, nodeId), Toast.LENGTH_SHORT).show();
+    }
+
+    private void refreshHazardMarkers() {
+        Map<String, HazardType> hazards = hazardManager.getAllHazards();
+        if (hazards.isEmpty()) {
+            sceneController.clearHazards();
+        } else {
+            sceneController.renderHazards(graph, hazards);
+        }
     }
 
     private void toggleGraphDebug() {

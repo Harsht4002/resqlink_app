@@ -62,4 +62,13 @@
     <string name="no_victims_detected">No victims detected</string>
     <string name="show_graph_debug">Show Graph Debug</string>
     <string name="hide_graph_debug">Hide Graph Debug</string>
+    <string name="section_hazard_marking">Hazard marking</string>
+    <string name="section_hazard_marking_subtitle">Tag dangerous areas so pathfinding routes around them.</string>
+    <string name="label_hazard_node">Location</string>
+    <string name="label_hazard_type">Hazard type</string>
+    <string name="btn_place_hazard">Place Hazard</string>
+    <string name="btn_remove_hazard">Remove Hazard</string>
+    <string name="toast_hazard_placed">%1$s hazard placed at %2$s</string>
+    <string name="toast_hazard_removed">Hazard removed from %1$s</string>
+    <string name="toast_no_hazard_at_node">No hazard at selected node</string>
 </resources>

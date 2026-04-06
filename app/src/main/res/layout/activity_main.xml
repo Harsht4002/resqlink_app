@@ -409,6 +409,93 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:text="@string/section_hazard_marking"
+                                android:textAppearance="@style/TextAppearance.ResQLink.SectionTitle" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="@string/section_hazard_marking_subtitle"
+                                android:textAppearance="@style/TextAppearance.ResQLink.SectionBody" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/section_inner_spacing"
+                                android:text="@string/label_hazard_node"
+                                android:textAppearance="@style/TextAppearance.ResQLink.SectionTitle"
+                                android:textSize="14sp" />
+
+                            <androidx.appcompat.widget.AppCompatSpinner
+                                android:id="@+id/spinnerHazardNode"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:background="@drawable/bg_spinner_field"
+                                android:popupBackground="@color/rescue_surface" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/control_spacing"
+                                android:text="@string/label_hazard_type"
+                                android:textAppearance="@style/TextAppearance.ResQLink.SectionTitle"
+                                android:textSize="14sp" />
+
+                            <androidx.appcompat.widget.AppCompatSpinner
+                                android:id="@+id/spinnerHazardType"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:background="@drawable/bg_spinner_field"
+                                android:popupBackground="@color/rescue_surface" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/control_spacing"
+                                android:orientation="horizontal">
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/btnPlaceHazard"
+                                    style="@style/Widget.ResQLink.Button.Alert"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="@string/btn_place_hazard" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/btnRemoveHazard"
+                                    style="@style/Widget.ResQLink.Button.Outlined"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/control_spacing"
+                                    android:layout_weight="1"
+                                    android:text="@string/btn_remove_hazard" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/section_spacing"
+                        app:cardBackgroundColor="@color/rescue_surface_alt"
+                        app:cardCornerRadius="@dimen/card_corner_radius"
+                        app:cardElevation="0dp"
+                        app:strokeColor="@color/rescue_outline"
+                        app:strokeWidth="1dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="@dimen/section_spacing">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
                                 android:text="@string/section_assets"
                                 android:textAppearance="@style/TextAppearance.ResQLink.SectionTitle" />
 

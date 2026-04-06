@@ -19,4 +19,5 @@
     <color name="rescue_scrim">#B3122229</color>
     <color name="rescue_chip_bg">#D9E8EB</color>
     <color name="rescue_handle">#A9BCC2</color>
+    <color name="rescue_alert_dark">#962F23</color>
 </resources>

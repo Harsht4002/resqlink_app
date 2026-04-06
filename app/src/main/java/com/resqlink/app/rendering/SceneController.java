@@ -3,8 +3,10 @@ package com.resqlink.app.rendering;
 import android.content.Context;
 
 import com.resqlink.app.navigation.Graph;
+import com.resqlink.app.navigation.HazardType;
 
 import java.util.List;
+import java.util.Map;
 
 import io.github.sceneview.SceneView;
 
@@ -17,12 +19,14 @@ public class SceneController {
     private final ModelLoader modelLoader;
     private final PathRenderer pathRenderer;
     private final GraphDebugRenderer graphDebugRenderer;
+    private final HazardRenderer hazardRenderer;
 
     public SceneController(SceneView sceneView, Context context) {
         this.sceneView = sceneView;
         this.modelLoader = new ModelLoader(sceneView, context);
         this.pathRenderer = new PathRenderer(sceneView);
         this.graphDebugRenderer = new GraphDebugRenderer(sceneView);
+        this.hazardRenderer = new HazardRenderer(sceneView);
     }
 
     public void initializeScene() {
@@ -46,5 +50,13 @@ public class SceneController {
 
     public void clearGraphDebug() {
         graphDebugRenderer.clearGraph();
+    }
+
+    public void renderHazards(Graph graph, Map<String, HazardType> hazards) {
+        hazardRenderer.renderHazards(graph, hazards);
+    }
+
+    public void clearHazards() {
+        hazardRenderer.clearHazards();
     }
 }

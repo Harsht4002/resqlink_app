@@ -16,6 +16,7 @@ public class Graph {
     private final List<Edge> edges;
     private final Map<String, Map<String, Double>> edgeCostMap;
     private final Map<String, Map<String, Edge>> edgeMap;
+    private HazardManager hazardManager;
 
     public Graph() {
         this.nodes = new HashMap<>();
@@ -101,11 +102,19 @@ public class Graph {
         return Collections.unmodifiableList(edges);
     }
 
+    public void setHazardManager(HazardManager hazardManager) {
+        this.hazardManager = hazardManager;
+    }
+
     public double getEdgeCost(Node a, Node b) {
         Map<String, Double> costs = edgeCostMap.get(a.getId());
         if (costs == null) return Double.POSITIVE_INFINITY;
         Double cost = costs.get(b.getId());
-        return cost != null ? cost : Double.POSITIVE_INFINITY;
+        if (cost == null) return Double.POSITIVE_INFINITY;
+        if (hazardManager != null) {
+            cost *= hazardManager.getEdgeCostMultiplier(a.getId(), b.getId());
+        }
+        return cost;
     }
 
     public Edge getEdge(Node a, Node b) {
