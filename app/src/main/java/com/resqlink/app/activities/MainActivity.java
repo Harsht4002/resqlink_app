@@ -266,10 +266,12 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
 
         int widthSpec = View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY);
         int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-        panelPrimaryControls.measure(widthSpec, heightSpec);
         View header = findViewById(R.id.panelHeader);
+        View status = findViewById(R.id.panelStatus);
         header.measure(widthSpec, heightSpec);
-        return header.getMeasuredHeight() + panelPrimaryControls.getMeasuredHeight();
+        status.measure(widthSpec, heightSpec);
+        panelPrimaryControls.measure(widthSpec, heightSpec);
+        return header.getMeasuredHeight() + status.getMeasuredHeight() + panelPrimaryControls.getMeasuredHeight();
     }
 
     private void applyExpandedScrollLimit() {
