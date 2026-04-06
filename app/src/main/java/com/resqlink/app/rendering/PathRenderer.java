@@ -9,8 +9,9 @@ import java.util.List;
 import com.google.android.filament.MaterialInstance;
 
 import dev.romainguy.kotlin.math.Float3;
-import kotlin.Unit;
 import dev.romainguy.kotlin.math.Float4;
+import dev.romainguy.kotlin.math.Quaternion;
+import kotlin.Unit;
 import io.github.sceneview.SceneView;
 import io.github.sceneview.node.CylinderNode;
 
@@ -82,9 +83,9 @@ public class PathRenderer {
                 continue;
             }
 
-            Float3 rotation = computeSegmentRotation(dx, dy, dz, dist);
-            addSegment(engine, mx, my, mz, dist, PATH_HALO_RADIUS, haloMaterial, rotation);
-            addSegment(engine, mx, my, mz, dist, PATH_CORE_RADIUS, coreMaterial, rotation);
+            Quaternion q = computeSegmentQuaternion(dx, dy, dz, dist);
+            addSegment(engine, mx, my, mz, dist, PATH_HALO_RADIUS, haloMaterial, q);
+            addSegment(engine, mx, my, mz, dist, PATH_CORE_RADIUS, coreMaterial, q);
         }
     }
 
@@ -95,7 +96,7 @@ public class PathRenderer {
                             float dist,
                             float radius,
                             MaterialInstance material,
-                            Float3 rotation) {
+                            Quaternion quaternion) {
         CylinderNode segment = new CylinderNode(
                 engine,
                 radius,
@@ -106,25 +107,41 @@ public class PathRenderer {
                 builder -> Unit.INSTANCE
         );
         segment.setPosition(new Float3(mx, my, mz));
-        segment.setRotation(rotation);
+        segment.setQuaternion(quaternion);
         sceneView.addChildNode(segment);
         pathNodes.add(segment);
     }
 
-    private Float3 computeSegmentRotation(float dx, float dy, float dz, float dist) {
-        float angleYDeg = (float) Math.toDegrees(Math.acos(Math.max(-1, Math.min(1, dy / dist))));
-        float rx = 0;
-        float rz = 0;
-        if (Math.abs(dy) < 0.999f * dist) {
-            float axisLen = (float) Math.sqrt(dz * dz + dx * dx);
-            if (axisLen > 1e-6f) {
-                rx = -dz / axisLen;
-                rz = dx / axisLen;
-            }
-        } else {
-            rz = 1;
+    /**
+     * Computes the quaternion that rotates the cylinder's default Y axis
+     * to point along the direction (dx, dy, dz).
+     */
+    private Quaternion computeSegmentQuaternion(float dx, float dy, float dz, float dist) {
+        float ny = dy / dist;
+
+        // Cross product: Y_axis × direction = (dz/dist, 0, -dx/dist)
+        float cx = dz / dist;
+        float cz = -dx / dist;
+        float crossLen = (float) Math.sqrt(cx * cx + cz * cz);
+
+        if (crossLen < 1e-6f) {
+            // Direction is (nearly) parallel to Y axis
+            return ny > 0
+                    ? new Quaternion(0f, 0f, 0f, 1f)
+                    : new Quaternion(0f, 0f, 1f, 0f);
         }
-        return new Float3(rx * angleYDeg, angleYDeg, rz * angleYDeg);
+
+        // Normalized rotation axis
+        float ax = cx / crossLen;
+        float az = cz / crossLen;
+
+        // Angle between Y axis and direction
+        float angle = (float) Math.acos(Math.max(-1f, Math.min(1f, ny)));
+        float halfAngle = angle / 2f;
+        float s = (float) Math.sin(halfAngle);
+        float c = (float) Math.cos(halfAngle);
+
+        return new Quaternion(ax * s, 0f, az * s, c);
     }
 
     public void clearPath() {

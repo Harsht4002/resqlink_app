@@ -218,13 +218,8 @@ private List<float[]> buildRenderPath(List<Node> path) {
     List<float[]> points = new ArrayList<>();
     if (path == null || path.size() < 2) return points;
 
-    for (int i = 0; i < path.size() - 1; i++) {
-        Node from = path.get(i);
-        Node to = path.get(i + 1);
-
-        // ALWAYS connect directly node → node
-        points.add(from.getRenderPosition());
-        points.add(to.getRenderPosition());
+    for (Node node : path) {
+        points.add(node.getRenderPosition());
     }
 
     return points;

@@ -11,6 +11,7 @@ import java.util.List;
 
 import dev.romainguy.kotlin.math.Float3;
 import dev.romainguy.kotlin.math.Float4;
+import dev.romainguy.kotlin.math.Quaternion;
 import io.github.sceneview.SceneView;
 import io.github.sceneview.node.CylinderNode;
 import kotlin.Unit;
@@ -111,7 +112,7 @@ public class GraphDebugRenderer {
         float mx = (ax + bx) / 2f;
         float my = (ay + by) / 2f;
         float mz = (az + bz) / 2f;
-        Float3 rotation = computeSegmentRotation(bx - ax, by - ay, bz - az, dist);
+        Quaternion q = computeSegmentQuaternion(bx - ax, by - ay, bz - az, dist);
 
         CylinderNode segment = new CylinderNode(
                 engine,
@@ -123,7 +124,7 @@ public class GraphDebugRenderer {
                 builder -> Unit.INSTANCE
         );
         segment.setPosition(new Float3(mx, my, mz));
-        segment.setRotation(rotation);
+        segment.setQuaternion(q);
         sceneView.addChildNode(segment);
         debugNodes.add(segment);
     }
@@ -151,20 +152,26 @@ public class GraphDebugRenderer {
         debugNodes.add(marker);
     }
 
-    private Float3 computeSegmentRotation(float dx, float dy, float dz, float dist) {
-        float angleYDeg = (float) Math.toDegrees(Math.acos(Math.max(-1, Math.min(1, dy / dist))));
-        float rx = 0f;
-        float rz = 0f;
-        if (Math.abs(dy) < 0.999f * dist) {
-            float axisLen = (float) Math.sqrt(dz * dz + dx * dx);
-            if (axisLen > 1e-6f) {
-                rx = -dz / axisLen;
-                rz = dx / axisLen;
-            }
-        } else {
-            rz = 1f;
+    private Quaternion computeSegmentQuaternion(float dx, float dy, float dz, float dist) {
+        float ny = dy / dist;
+        float cx = dz / dist;
+        float cz = -dx / dist;
+        float crossLen = (float) Math.sqrt(cx * cx + cz * cz);
+
+        if (crossLen < 1e-6f) {
+            return ny > 0
+                    ? new Quaternion(0f, 0f, 0f, 1f)
+                    : new Quaternion(0f, 0f, 1f, 0f);
         }
-        return new Float3(rx * angleYDeg, angleYDeg, rz * angleYDeg);
+
+        float ax = cx / crossLen;
+        float az = cz / crossLen;
+        float angle = (float) Math.acos(Math.max(-1f, Math.min(1f, ny)));
+        float halfAngle = angle / 2f;
+        float s = (float) Math.sin(halfAngle);
+        float c = (float) Math.cos(halfAngle);
+
+        return new Quaternion(ax * s, 0f, az * s, c);
     }
 
     public void clearGraph() {
