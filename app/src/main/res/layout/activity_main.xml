@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/screen_margin"
-        android:layout_marginTop="@dimen/screen_margin"
+        android:layout_marginTop="12dp"
         android:layout_marginEnd="@dimen/screen_margin"
         android:orientation="vertical">
 
@@ -35,72 +35,27 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="2dp"
             android:text="@string/dashboard_title"
             android:textAppearance="@style/TextAppearance.ResQLink.HeroTitle" />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:maxWidth="420dp"
-            android:text="@string/dashboard_subtitle"
-            android:textAppearance="@style/TextAppearance.ResQLink.HeroBody" />
-
-        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/tvRouteStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/section_spacing"
-            app:cardBackgroundColor="@color/rescue_surface"
-            app:cardCornerRadius="@dimen/card_corner_radius"
-            app:cardElevation="4dp"
-            app:strokeColor="@color/rescue_outline"
-            app:strokeWidth="1dp">
+            android:layout_marginTop="6dp"
+            android:text="@string/route_idle"
+            android:textColor="@color/rescue_primary_light"
+            android:textStyle="bold" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="@dimen/section_spacing">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/mission_status"
-                    android:textAppearance="@style/TextAppearance.ResQLink.HeroEyebrow"
-                    android:textColor="@color/rescue_primary" />
-
-                <TextView
-                    android:id="@+id/tvRouteStatus"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/route_idle"
-                    android:textAppearance="@style/TextAppearance.ResQLink.SectionTitle" />
-
-                <TextView
-                    android:id="@+id/tvTurnInstruction"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="@string/turn_instruction_placeholder"
-                    android:textAppearance="@style/TextAppearance.ResQLink.SectionBody" />
-
-                <TextView
-                    android:id="@+id/tvDetectedRoom"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:background="@drawable/bg_status_chip"
-                    android:paddingStart="12dp"
-                    android:paddingTop="8dp"
-                    android:paddingEnd="12dp"
-                    android:paddingBottom="8dp"
-                    android:text="@string/detected_room_unknown"
-                    android:textColor="@color/rescue_text_primary"
-                    android:textStyle="bold" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+        <TextView
+            android:id="@+id/tvTurnInstruction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="@string/turn_instruction_placeholder"
+            android:textColor="@color/rescue_primary_light"
+            android:textSize="13sp" />
     </LinearLayout>
 
     <com.google.android.material.card.MaterialCardView
@@ -128,102 +83,66 @@
                 android:id="@+id/panelHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
                 android:paddingStart="@dimen/section_spacing"
                 android:paddingTop="10dp"
                 android:paddingEnd="@dimen/section_spacing"
-                android:paddingBottom="10dp">
+                android:paddingBottom="6dp">
 
                 <View
                     android:layout_width="44dp"
                     android:layout_height="5dp"
-                    android:layout_gravity="center_horizontal"
+                    android:layout_gravity="center_vertical"
                     android:background="@drawable/bg_panel_handle" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/tvPanelTitle"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:text="@string/panel_navigation_controls"
+                    android:textAppearance="@style/TextAppearance.ResQLink.SectionTitle" />
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/tvPanelTitle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/panel_navigation_controls"
-                            android:textAppearance="@style/TextAppearance.ResQLink.SectionTitle" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="@string/quick_actions_subtitle"
-                            android:textAppearance="@style/TextAppearance.ResQLink.SectionBody" />
-                    </LinearLayout>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnTogglePanel"
-                        style="@style/Widget.ResQLink.Button.Outlined"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:minWidth="0dp"
-                        android:text="@string/panel_expand" />
-                </LinearLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnTogglePanel"
+                    style="@style/Widget.ResQLink.Button.Outlined"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:minWidth="0dp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:text="@string/panel_expand"
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/panelPrimaryControls"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:orientation="horizontal"
                 android:paddingStart="@dimen/section_spacing"
-                android:paddingTop="4dp"
                 android:paddingEnd="@dimen/section_spacing"
-                android:paddingBottom="@dimen/section_spacing">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/quick_actions"
-                    android:textAppearance="@style/TextAppearance.ResQLink.SectionTitle" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnFindPath"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/btn_find_path" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnNextTurn"
-                        style="@style/Widget.ResQLink.Button.Outlined"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/control_spacing"
-                        android:layout_weight="1"
-                        android:text="@string/btn_next_turn" />
-                </LinearLayout>
+                android:paddingBottom="10dp">
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnNavigateVictim"
-                    style="@style/Widget.ResQLink.Button.Accent"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/control_spacing"
-                    android:text="@string/navigate_to_victim" />
+                    android:id="@+id/btnFindPath"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:text="@string/btn_find_path"
+                    android:textSize="13sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnNextTurn"
+                    style="@style/Widget.ResQLink.Button.Outlined"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:text="@string/btn_next_turn"
+                    android:textSize="13sp" />
             </LinearLayout>
 
             <androidx.core.widget.NestedScrollView
@@ -234,13 +153,14 @@
                 android:fillViewport="true"
                 android:paddingStart="@dimen/section_spacing"
                 android:paddingEnd="@dimen/section_spacing"
-                android:paddingBottom="@dimen/section_spacing">
+                android:paddingBottom="12dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
+                    <!-- Route Planning -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -254,7 +174,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:padding="@dimen/section_spacing">
+                            android:padding="12dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -265,48 +185,42 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="@string/section_route_planning_subtitle"
-                                android:textAppearance="@style/TextAppearance.ResQLink.SectionBody" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/section_inner_spacing"
+                                android:layout_marginTop="10dp"
                                 android:text="@string/label_start_location"
-                                android:textAppearance="@style/TextAppearance.ResQLink.SectionTitle"
-                                android:textSize="14sp" />
+                                android:textColor="@color/rescue_text_secondary"
+                                android:textSize="13sp" />
 
                             <androidx.appcompat.widget.AppCompatSpinner
                                 android:id="@+id/spinnerStart"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
+                                android:layout_marginTop="4dp"
                                 android:background="@drawable/bg_spinner_field"
                                 android:popupBackground="@color/rescue_surface" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/control_spacing"
+                                android:layout_marginTop="10dp"
                                 android:text="@string/label_destination_location"
-                                android:textAppearance="@style/TextAppearance.ResQLink.SectionTitle"
-                                android:textSize="14sp" />
+                                android:textColor="@color/rescue_text_secondary"
+                                android:textSize="13sp" />
 
                             <androidx.appcompat.widget.AppCompatSpinner
                                 android:id="@+id/spinnerDestination"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
+                                android:layout_marginTop="4dp"
                                 android:background="@drawable/bg_spinner_field"
                                 android:popupBackground="@color/rescue_surface" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
+                    <!-- Victim Signals -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/section_spacing"
+                        android:layout_marginTop="10dp"
                         app:cardBackgroundColor="@color/rescue_surface_alt"
                         app:cardCornerRadius="@dimen/card_corner_radius"
                         app:cardElevation="0dp"
@@ -317,7 +231,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:padding="@dimen/section_spacing">
+                            android:padding="12dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -326,74 +240,94 @@
                                 android:textAppearance="@style/TextAppearance.ResQLink.SectionTitle" />
 
                             <TextView
+                                android:id="@+id/tvDetectedRoom"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="@string/section_victim_signals_subtitle"
-                                android:textAppearance="@style/TextAppearance.ResQLink.SectionBody" />
+                                android:layout_marginTop="8dp"
+                                android:background="@drawable/bg_status_chip"
+                                android:paddingStart="10dp"
+                                android:paddingTop="6dp"
+                                android:paddingEnd="10dp"
+                                android:paddingBottom="6dp"
+                                android:text="@string/detected_room_unknown"
+                                android:textColor="@color/rescue_text_primary"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/section_inner_spacing"
+                                android:layout_marginTop="10dp"
                                 android:text="@string/broadcast_location_label"
-                                android:textAppearance="@style/TextAppearance.ResQLink.SectionTitle"
-                                android:textSize="14sp" />
+                                android:textColor="@color/rescue_text_secondary"
+                                android:textSize="13sp" />
 
                             <androidx.appcompat.widget.AppCompatSpinner
                                 android:id="@+id/spinnerVictimLocation"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
+                                android:layout_marginTop="4dp"
                                 android:background="@drawable/bg_spinner_field"
                                 android:popupBackground="@color/rescue_surface" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/control_spacing"
+                                android:layout_marginTop="10dp"
                                 android:text="@string/victims_nearby"
-                                android:textAppearance="@style/TextAppearance.ResQLink.SectionTitle"
-                                android:textSize="14sp" />
+                                android:textColor="@color/rescue_text_secondary"
+                                android:textSize="13sp" />
 
                             <androidx.appcompat.widget.AppCompatSpinner
                                 android:id="@+id/spinnerVictims"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
+                                android:layout_marginTop="4dp"
                                 android:background="@drawable/bg_spinner_field"
                                 android:popupBackground="@color/rescue_surface" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnNavigateVictim"
+                                style="@style/Widget.ResQLink.Button.Accent"
+                                android:layout_width="match_parent"
+                                android:layout_height="44dp"
+                                android:layout_marginTop="10dp"
+                                android:text="@string/navigate_to_victim"
+                                android:textSize="13sp" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/control_spacing"
+                                android:layout_marginTop="8dp"
                                 android:orientation="horizontal">
 
                                 <com.google.android.material.button.MaterialButton
                                     android:id="@+id/btnStartBleScan"
                                     style="@style/Widget.ResQLink.Button.Outlined"
                                     android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
+                                    android:layout_height="44dp"
                                     android:layout_weight="1"
-                                    android:text="@string/start_ble_scan" />
+                                    android:text="@string/start_ble_scan"
+                                    android:textSize="12sp" />
 
                                 <com.google.android.material.button.MaterialButton
                                     android:id="@+id/btnBroadcastVictim"
                                     style="@style/Widget.ResQLink.Button.Outlined"
                                     android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginStart="@dimen/control_spacing"
+                                    android:layout_height="44dp"
+                                    android:layout_marginStart="8dp"
                                     android:layout_weight="1"
-                                    android:text="@string/start_victim_broadcast" />
+                                    android:text="@string/start_victim_broadcast"
+                                    android:textSize="12sp" />
                             </LinearLayout>
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
+                    <!-- Hazard Marking -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/section_spacing"
+                        android:layout_marginTop="10dp"
                         app:cardBackgroundColor="@color/rescue_surface_alt"
                         app:cardCornerRadius="@dimen/card_corner_radius"
                         app:cardElevation="0dp"
@@ -404,7 +338,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:padding="@dimen/section_spacing">
+                            android:padding="12dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -415,72 +349,68 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="@string/section_hazard_marking_subtitle"
-                                android:textAppearance="@style/TextAppearance.ResQLink.SectionBody" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/section_inner_spacing"
+                                android:layout_marginTop="10dp"
                                 android:text="@string/label_hazard_node"
-                                android:textAppearance="@style/TextAppearance.ResQLink.SectionTitle"
-                                android:textSize="14sp" />
+                                android:textColor="@color/rescue_text_secondary"
+                                android:textSize="13sp" />
 
                             <androidx.appcompat.widget.AppCompatSpinner
                                 android:id="@+id/spinnerHazardNode"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
+                                android:layout_marginTop="4dp"
                                 android:background="@drawable/bg_spinner_field"
                                 android:popupBackground="@color/rescue_surface" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/control_spacing"
+                                android:layout_marginTop="10dp"
                                 android:text="@string/label_hazard_type"
-                                android:textAppearance="@style/TextAppearance.ResQLink.SectionTitle"
-                                android:textSize="14sp" />
+                                android:textColor="@color/rescue_text_secondary"
+                                android:textSize="13sp" />
 
                             <androidx.appcompat.widget.AppCompatSpinner
                                 android:id="@+id/spinnerHazardType"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
+                                android:layout_marginTop="4dp"
                                 android:background="@drawable/bg_spinner_field"
                                 android:popupBackground="@color/rescue_surface" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/control_spacing"
+                                android:layout_marginTop="10dp"
                                 android:orientation="horizontal">
 
                                 <com.google.android.material.button.MaterialButton
                                     android:id="@+id/btnPlaceHazard"
                                     style="@style/Widget.ResQLink.Button.Alert"
                                     android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
+                                    android:layout_height="44dp"
                                     android:layout_weight="1"
-                                    android:text="@string/btn_place_hazard" />
+                                    android:text="@string/btn_place_hazard"
+                                    android:textSize="13sp" />
 
                                 <com.google.android.material.button.MaterialButton
                                     android:id="@+id/btnRemoveHazard"
                                     style="@style/Widget.ResQLink.Button.Outlined"
                                     android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginStart="@dimen/control_spacing"
+                                    android:layout_height="44dp"
+                                    android:layout_marginStart="8dp"
                                     android:layout_weight="1"
-                                    android:text="@string/btn_remove_hazard" />
+                                    android:text="@string/btn_remove_hazard"
+                                    android:textSize="13sp" />
                             </LinearLayout>
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
+                    <!-- Asset Configuration -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/section_spacing"
+                        android:layout_marginTop="10dp"
                         app:cardBackgroundColor="@color/rescue_surface_alt"
                         app:cardCornerRadius="@dimen/card_corner_radius"
                         app:cardElevation="0dp"
@@ -491,7 +421,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:padding="@dimen/section_spacing">
+                            android:padding="12dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -499,41 +429,20 @@
                                 android:text="@string/section_assets"
                                 android:textAppearance="@style/TextAppearance.ResQLink.SectionTitle" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="@string/section_assets_subtitle"
-                                android:textAppearance="@style/TextAppearance.ResQLink.SectionBody" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/section_inner_spacing"
-                                android:text="@string/graph_debug_title"
-                                android:textAppearance="@style/TextAppearance.ResQLink.SectionTitle"
-                                android:textSize="14sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="@string/graph_debug_subtitle"
-                                android:textAppearance="@style/TextAppearance.ResQLink.SectionBody" />
-
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btnToggleGraphDebug"
                                 style="@style/Widget.ResQLink.Button.Outlined"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/control_spacing"
-                                android:text="@string/show_graph_debug" />
+                                android:layout_height="40dp"
+                                android:layout_marginTop="10dp"
+                                android:text="@string/show_graph_debug"
+                                android:textSize="12sp" />
 
                             <com.google.android.material.textfield.TextInputLayout
                                 style="@style/Widget.ResQLink.TextInputLayout"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/section_spacing"
+                                android:layout_marginTop="10dp"
                                 android:hint="@string/hint_json_path">
 
                                 <com.google.android.material.textfield.TextInputEditText
@@ -549,7 +458,7 @@
                                 style="@style/Widget.ResQLink.TextInputLayout"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/control_spacing"
+                                android:layout_marginTop="8dp"
                                 android:hint="@string/hint_model_path">
 
                                 <com.google.android.material.textfield.TextInputEditText
@@ -565,9 +474,10 @@
                                 android:id="@+id/btnLoad"
                                 style="@style/Widget.ResQLink.Button.Outlined"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/control_spacing"
-                                android:text="@string/btn_load" />
+                                android:layout_height="40dp"
+                                android:layout_marginTop="8dp"
+                                android:text="@string/btn_load"
+                                android:textSize="12sp" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 

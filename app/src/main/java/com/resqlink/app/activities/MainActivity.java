@@ -276,9 +276,9 @@ public class MainActivity extends AppCompatActivity implements BleScannerManager
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         float widthDp = metrics.widthPixels / metrics.density;
         float heightRatio = widthDp >= 600
-                ? 0.46f
-                : (metrics.widthPixels > metrics.heightPixels ? 0.38f : 0.44f);
-        int maxScrollHeight = Math.max(dpToPx(220), (int) (metrics.heightPixels * heightRatio));
+                ? 0.50f
+                : (metrics.widthPixels > metrics.heightPixels ? 0.42f : 0.48f);
+        int maxScrollHeight = Math.max(dpToPx(240), (int) (metrics.heightPixels * heightRatio));
         ViewGroup.LayoutParams params = panelScroll.getLayoutParams();
         params.height = maxScrollHeight;
         panelScroll.setLayoutParams(params);
